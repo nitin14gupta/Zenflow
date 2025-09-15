@@ -4,6 +4,7 @@ import { Poppins_400Regular, Poppins_600SemiBold, Poppins_700Bold } from "@expo-
 import { useEffect } from "react";
 import { View } from "react-native";
 import { OnboardingProvider } from "../context/OnboardingContext";
+import { ToastProvider } from "../context/ToastContext";
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -21,11 +22,13 @@ export default function RootLayout() {
   }
   return (
     <OnboardingProvider>
-      <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-      </Stack>
+      <ToastProvider>
+        <Stack>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        </Stack>
+      </ToastProvider>
     </OnboardingProvider>
   )
 }

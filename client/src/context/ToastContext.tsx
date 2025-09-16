@@ -4,7 +4,7 @@ import { Animated, Text, View } from "react-native";
 type ToastType = "success" | "error" | "info";
 
 type ToastContextValue = {
-    show: (message: string, type?: ToastType, durationMs?: number) => void;
+    showToast: (message: string, type?: ToastType, durationMs?: number) => void;
 };
 
 const ToastContext = createContext<ToastContextValue | undefined>(undefined);
@@ -14,7 +14,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const [type, setType] = useState<ToastType>("info");
     const opacity = useRef(new Animated.Value(0)).current;
 
-    const show = useCallback((msg: string, t: ToastType = "info", durationMs = 2200) => {
+    const showToast = useCallback((msg: string, t: ToastType = "info", durationMs = 2200) => {
         setMessage(msg);
         setType(t);
         Animated.sequence([
@@ -24,7 +24,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         ]).start();
     }, [opacity]);
 
-    const value = useMemo(() => ({ show }), [show]);
+    const value = useMemo(() => ({ showToast }), [showToast]);
     const bg = type === "success" ? "#10B981" : type === "error" ? "#EF4444" : "#111827";
 
     return (

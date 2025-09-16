@@ -44,6 +44,12 @@ const repeatOptions = [
     { id: '8', label: 'Custom', value: 'custom' }
 ];
 
+type ChecklistItem = {
+    id: string;
+    text: string;
+    completed: boolean;
+};
+
 export default function PlanDetails() {
     const router = useRouter();
     const { planName } = useLocalSearchParams();
@@ -55,15 +61,18 @@ export default function PlanDetails() {
     const [selectedDuration, setSelectedDuration] = useState(durationOptions[4]); // 1h default
     const [selectedEmoji, setSelectedEmoji] = useState('🧘‍♀️');
     const [selectedRepeat, setSelectedRepeat] = useState(repeatOptions[4]); // Weekly default
-    const [startTime, setStartTime] = useState('11:00');
-    const [endTime, setEndTime] = useState('12:00');
+    const [startTimeText, setStartTimeText] = useState<string>('6:00');
+    const [startPeriod, setStartPeriod] = useState<'AM' | 'PM'>('PM');
+    const [endTimeText, setEndTimeText] = useState<string>('8:00');
+    const [endPeriod, setEndPeriod] = useState<'AM' | 'PM'>('PM');
+    const [isAnytime, setIsAnytime] = useState(false);
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [reminders, setReminders] = useState({
         atStart: true,
         atEnd: false,
         beforeStart: false
     });
-    const [checklist, setChecklist] = useState([]);
+    const [checklist, setChecklist] = useState<ChecklistItem[]>([]);
     const [notes, setNotes] = useState('');
 
     // Modal states
@@ -72,6 +81,7 @@ export default function PlanDetails() {
     const [showNotesModal, setShowNotesModal] = useState(false);
     const [showEmojiModal, setShowEmojiModal] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [showDateModal, setShowDateModal] = useState(false);
 
     const getCurrentDate = () => {
         return selectedDate.toLocaleDateString('en-US', {
@@ -113,9 +123,10 @@ export default function PlanDetails() {
                 color: selectedColor.color,
                 emoji: selectedEmoji,
                 duration_minutes: selectedDuration.value,
-                start_time: startTime,
-                end_time: endTime,
+                start_time: isAnytime ? null : `${startTimeText} ${startPeriod}`,
+                end_time: isAnytime ? null : `${endTimeText} ${endPeriod}`,
                 scheduled_date: selectedDate.toISOString().split('T')[0],
+                is_anytime: isAnytime,
                 repeat_type: selectedRepeat.value,
                 reminder_at_start: reminders.atStart,
                 reminder_at_end: reminders.atEnd,
@@ -127,7 +138,7 @@ export default function PlanDetails() {
             const response = await apiService.createPlan(planData);
             if (response.success) {
                 showToast('Plan created successfully!', 'success');
-                router.back();
+                router.push('/(tabs)');
             } else {
                 showToast(response.error || 'Failed to create plan', 'error');
             }
@@ -150,8 +161,9 @@ export default function PlanDetails() {
                 flexDirection: 'row',
                 alignItems: 'center'
             }}>
+
                 <Pressable
-                    onPress={() => router.back()}
+                    onPress={() => router.push('/(tabs)')}
                     style={{
                         width: 40,
                         height: 40,
@@ -248,6 +260,7 @@ export default function PlanDetails() {
                         Duration
                     </Text>
 
+                    {/* Duration */}
                     <Pressable
                         onPress={() => setShowDurationModal(true)}
                         style={{
@@ -269,41 +282,93 @@ export default function PlanDetails() {
                         </Text>
                     </Pressable>
 
+                    {/* Time */}
                     <View style={{ flexDirection: 'row', gap: 12, marginBottom: 16 }}>
-                        <Pressable style={{
+                        <View style={{
                             flex: 1,
                             backgroundColor: '#F9FAFB',
                             borderRadius: 12,
-                            padding: 16,
-                            alignItems: 'center'
+                            padding: 12,
+                            alignItems: 'center',
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            opacity: isAnytime ? 0.6 : 1
                         }}>
-                            <Text style={{
-                                fontFamily: 'Poppins_600SemiBold',
-                                fontSize: 16,
-                                color: '#111827'
-                            }}>
-                                {startTime}
-                            </Text>
-                        </Pressable>
+                            <TextInput
+                                editable={!isAnytime}
+                                value={startTimeText}
+                                onChangeText={setStartTimeText}
+                                keyboardType="numbers-and-punctuation"
+                                placeholder="6:00"
+                                style={{
+                                    flex: 1,
+                                    textAlign: 'center',
+                                    fontFamily: 'Poppins_600SemiBold',
+                                    fontSize: 16,
+                                    color: '#111827'
+                                }}
+                            />
+                            <Pressable
+                                disabled={isAnytime}
+                                onPress={() => setStartPeriod(startPeriod === 'AM' ? 'PM' : 'AM')}
+                                style={{
+                                    marginLeft: 8,
+                                    paddingVertical: 6,
+                                    paddingHorizontal: 10,
+                                    borderRadius: 8,
+                                    backgroundColor: '#fff',
+                                    borderWidth: 1,
+                                    borderColor: '#E5E7EB'
+                                }}
+                            >
+                                <Text style={{ fontFamily: 'Poppins_600SemiBold', fontSize: 14, color: '#111827' }}>{startPeriod}</Text>
+                            </Pressable>
+                        </View>
                         <Text style={{ alignSelf: 'center', fontSize: 16, color: '#6B7280' }}>→</Text>
-                        <Pressable style={{
+                        <View style={{
                             flex: 1,
                             backgroundColor: '#F9FAFB',
                             borderRadius: 12,
-                            padding: 16,
-                            alignItems: 'center'
+                            padding: 12,
+                            alignItems: 'center',
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            opacity: isAnytime ? 0.6 : 1
                         }}>
-                            <Text style={{
-                                fontFamily: 'Poppins_600SemiBold',
-                                fontSize: 16,
-                                color: '#111827'
-                            }}>
-                                {endTime}
-                            </Text>
-                        </Pressable>
+                            <TextInput
+                                editable={!isAnytime}
+                                value={endTimeText}
+                                onChangeText={setEndTimeText}
+                                keyboardType="numbers-and-punctuation"
+                                placeholder="8:00"
+                                style={{
+                                    flex: 1,
+                                    textAlign: 'center',
+                                    fontFamily: 'Poppins_600SemiBold',
+                                    fontSize: 16,
+                                    color: '#111827'
+                                }}
+                            />
+                            <Pressable
+                                disabled={isAnytime}
+                                onPress={() => setEndPeriod(endPeriod === 'AM' ? 'PM' : 'AM')}
+                                style={{
+                                    marginLeft: 8,
+                                    paddingVertical: 6,
+                                    paddingHorizontal: 10,
+                                    borderRadius: 8,
+                                    backgroundColor: '#fff',
+                                    borderWidth: 1,
+                                    borderColor: '#E5E7EB'
+                                }}
+                            >
+                                <Text style={{ fontFamily: 'Poppins_600SemiBold', fontSize: 14, color: '#111827' }}>{endPeriod}</Text>
+                            </Pressable>
+                        </View>
                     </View>
 
-                    <Pressable style={{
+                    {/* Date */}
+                    <Pressable onPress={() => setShowDateModal(true)} style={{
                         flexDirection: 'row',
                         alignItems: 'center',
                         backgroundColor: '#F9FAFB',
@@ -321,14 +386,31 @@ export default function PlanDetails() {
                         </Text>
                     </Pressable>
 
-                    <Text style={{
-                        fontFamily: 'Poppins_400Regular',
-                        fontSize: 14,
-                        color: '#6B7280',
-                        textAlign: 'center'
-                    }}>
-                        Remove scheduled time
-                    </Text>
+                    {/* Anytime */}
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }}>
+                        <Text style={{ fontFamily: 'Poppins_400Regular', fontSize: 16, color: '#111827' }}>
+                            Anytime
+                        </Text>
+                        <Pressable
+                            onPress={() => setIsAnytime(!isAnytime)}
+                            style={{
+                                width: 50,
+                                height: 30,
+                                borderRadius: 15,
+                                backgroundColor: isAnytime ? '#10B981' : '#D1D5DB',
+                                alignItems: isAnytime ? 'flex-end' : 'flex-start',
+                                justifyContent: 'center',
+                                paddingHorizontal: 2
+                            }}
+                        >
+                            <View style={{
+                                width: 26,
+                                height: 26,
+                                borderRadius: 13,
+                                backgroundColor: 'white'
+                            }} />
+                        </Pressable>
+                    </View>
                 </View>
 
                 {/* Emoji Selection */}
@@ -715,6 +797,54 @@ export default function PlanDetails() {
                                 borderRadius: 12,
                                 padding: 16,
                                 alignItems: 'center'
+                            }}
+                        >
+                            <Text style={{ fontFamily: 'Poppins_600SemiBold', fontSize: 16, color: 'white' }}>
+                                Save
+                            </Text>
+                        </Pressable>
+                    </View>
+                </View>
+            </Modal>
+
+            {/* Date Modal */}
+            <Modal visible={showDateModal} transparent animationType="slide">
+                <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}>
+                    <View style={{ backgroundColor: 'white', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20 }}>
+                        <View style={{ width: 40, height: 4, backgroundColor: '#D1D5DB', borderRadius: 2, alignSelf: 'center', marginBottom: 20 }} />
+
+                        <Text style={{ fontFamily: 'Poppins_700Bold', fontSize: 18, color: '#111827', marginBottom: 16, textAlign: 'center' }}>
+                            Select Date
+                        </Text>
+
+                        <ScrollView style={{ maxHeight: 320 }}>
+                            {Array.from({ length: 60 }).map((_, idx) => {
+                                const d = new Date();
+                                d.setDate(d.getDate() + idx);
+                                const isSelected = d.toDateString() === selectedDate.toDateString();
+                                return (
+                                    <Pressable key={idx} onPress={() => setSelectedDate(new Date(d))} style={{
+                                        paddingVertical: 12,
+                                        paddingHorizontal: 8,
+                                        borderRadius: 10,
+                                        backgroundColor: isSelected ? '#F3F4F6' : 'transparent'
+                                    }}>
+                                        <Text style={{ fontFamily: 'Poppins_400Regular', fontSize: 16, color: '#111827' }}>
+                                            {d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+                                        </Text>
+                                    </Pressable>
+                                );
+                            })}
+                        </ScrollView>
+
+                        <Pressable
+                            onPress={() => setShowDateModal(false)}
+                            style={{
+                                backgroundColor: '#111827',
+                                borderRadius: 12,
+                                padding: 16,
+                                alignItems: 'center',
+                                marginTop: 16
                             }}
                         >
                             <Text style={{ fontFamily: 'Poppins_600SemiBold', fontSize: 16, color: 'white' }}>

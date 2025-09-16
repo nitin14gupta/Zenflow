@@ -3,7 +3,7 @@ import { View, Text, Pressable, ScrollView, Dimensions, RefreshControl } from 'r
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../../components/ui';
 import { useAuth } from '../../context/AuthContext';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { StatusBar } from 'react-native';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { apiService } from '../../api/apiService';
@@ -35,6 +35,12 @@ export default function Home() {
   useEffect(() => {
     loadPlans();
   }, [loadPlans]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadPlans();
+    }, [loadPlans])
+  );
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -95,7 +101,7 @@ export default function Home() {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#FFF9F0' }}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F0F9FF" />
+      <StatusBar barStyle="dark-content" backgroundColor="#FFF9F0" />
       {/* Header */}
       <View style={{
         paddingTop: 10,

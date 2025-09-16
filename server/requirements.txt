@@ -1,0 +1,10 @@
+flask
+flask-cors
+python-dotenv
+psycopg2-binary
+supabase
+pyjwt
+bcrypt
+smtplib
+email-validator
+python-multipart

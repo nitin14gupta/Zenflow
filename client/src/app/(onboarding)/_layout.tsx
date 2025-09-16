@@ -4,7 +4,6 @@ import { Platform } from "react-native";
 export default function RootLayout() {
   return (
     <Stack>
-      <Stack.Screen name="splash" options={{ headerShown: false }} />
       <Stack.Screen name="age" options={{ headerShown: false, animation: Platform.select({ ios: "slide_from_right", android: "slide_from_right" }) }} />
       <Stack.Screen name="gender" options={{ headerShown: false }} />
       <Stack.Screen name="welcome" options={{ headerShown: false }} />

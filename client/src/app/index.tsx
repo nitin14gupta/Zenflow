@@ -3,19 +3,27 @@ import React, { useEffect, useRef } from 'react'
 import { colors, ScreenContainer } from "../components/ui";
 import { OnboardingProvider } from "../context/OnboardingContext";
 import { ToastProvider } from "../context/ToastContext";
+import { useAuth } from "../context/AuthContext";
 import { useRouter } from "expo-router";
 
 export default function index() {
   const fade = useRef(new Animated.Value(0)).current;
   const router = useRouter();
+  const { isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
     Animated.timing(fade, { toValue: 1, duration: 800, useNativeDriver: true }).start();
+
     const t = setTimeout(() => {
-      router.replace("/(onboarding)/splash");
+      if (isAuthenticated) {
+        router.replace("/(tabs)");
+      } else {
+        router.replace("/(onboarding)/age");
+      }
     }, 2000);
+
     return () => clearTimeout(t);
-  }, [fade, router]);
+  }, [fade, router, isAuthenticated]);
 
   return (
     <OnboardingProvider>

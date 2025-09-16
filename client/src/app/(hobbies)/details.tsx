@@ -7,12 +7,12 @@ import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 
 const colorOptions = [
-    { id: '1', color: '#E8E4F3', name: 'Lavender' },
-    { id: '2', color: '#B8D8E7', name: 'Blue' },
-    { id: '3', color: '#FFB5A7', name: 'Coral' },
-    { id: '4', color: '#FF8A65', name: 'Orange' },
-    { id: '5', color: '#A8E6CF', name: 'Mint' },
-    { id: '6', color: '#FFD93D', name: 'Yellow' }
+    { id: '1', color: '#F1EFF7', name: 'Lavender' },
+    { id: '2', color: '#DEEDF4', name: 'Blue' },
+    { id: '3', color: '#FFDCD5', name: 'Coral' },
+    { id: '4', color: '#FFC7B5', name: 'Orange' },
+    { id: '5', color: '#D3F2E7', name: 'Mint' },
+    { id: '6', color: '#FFEC9E', name: 'Yellow' }
 ];
 
 const durationOptions = [

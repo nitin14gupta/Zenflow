@@ -12,7 +12,7 @@ export default function Privacy() {
 
             {/* Header */}
             <View style={{
-                paddingTop: 50,
+                paddingTop: 25,
                 paddingHorizontal: 20,
                 paddingBottom: 20,
                 flexDirection: 'row',

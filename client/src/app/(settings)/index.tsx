@@ -72,7 +72,7 @@ export default function Settings() {
 
             {/* Header */}
             <View style={{
-                paddingTop: 20,
+                paddingTop: 25,
                 paddingHorizontal: 20,
                 paddingBottom: 20,
                 flexDirection: 'row',

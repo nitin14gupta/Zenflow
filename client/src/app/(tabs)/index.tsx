@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, Pressable, ScrollView, Dimensions, RefreshControl } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../../components/ui';
@@ -7,6 +7,7 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import { StatusBar } from 'react-native';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { apiService } from '../../api/apiService';
+import { MaterialIcons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 
@@ -18,6 +19,10 @@ export default function Home() {
   const [anytimePlans, setAnytimePlans] = useState<any[]>([]);
   const [confettiAt, setConfettiAt] = useState<number | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [showDaily, setShowDaily] = useState(true);
+  const [showAnytime, setShowAnytime] = useState(true);
+  const scrollRef = useRef<ScrollView>(null);
+  const [didScrollToToday, setDidScrollToToday] = useState(false);
 
   const loadPlans = useCallback(async () => {
     if (!user?.id) return;
@@ -48,6 +53,8 @@ export default function Home() {
     setRefreshing(false);
   }, [loadPlans]);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showPlanModal, setShowPlanModal] = useState(false);
+  const [modalPlan, setModalPlan] = useState<any | null>(null);
 
   const getCurrentDate = () => {
     const today = new Date();
@@ -60,10 +67,10 @@ export default function Home() {
 
   const getTimelineDays = () => {
     const today = new Date();
-    const days = [];
+    const days = [] as any[];
 
-    // Show 30 days from today
-    for (let i = 0; i < 30; i++) {
+    // 10 days before today and 30 days after today
+    for (let i = -10; i < 30; i++) {
       const date = new Date(today);
       date.setDate(today.getDate() + i);
       days.push({
@@ -149,6 +156,7 @@ export default function Home() {
           }}
         >
           <ScrollView
+            ref={scrollRef}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: 8 }}
@@ -158,6 +166,16 @@ export default function Home() {
                 <Pressable
                   key={index}
                   onPress={() => setSelectedDate(day.fullDate)}
+                  onLayout={(e) => {
+                    if (didScrollToToday) return;
+                    const isTodayCell = day.fullDate.toDateString() === new Date().toDateString();
+                    if (isTodayCell) {
+                      const x = e.nativeEvent.layout.x;
+                      const offset = Math.max(0, x - 120); // pre-scroll so today is visible with some left context
+                      scrollRef.current?.scrollTo({ x: offset, animated: false });
+                      setDidScrollToToday(true);
+                    }
+                  }}
                   style={{
                     alignItems: 'center',
                     paddingVertical: 8,
@@ -195,7 +213,8 @@ export default function Home() {
                     height: 8,
                     borderRadius: 4,
                     borderWidth: 1,
-                    borderColor: '#374151'
+                    borderColor: '#374151',
+                    backgroundColor: day.fullDate.toDateString() === selectedDate.toDateString() ? '#374151' : 'transparent'
                   }} />
                 </Pressable>
               ))}
@@ -215,18 +234,20 @@ export default function Home() {
             alignItems: 'center',
             marginBottom: 10
           }}>
-            <Text style={{
-              fontFamily: 'Poppins_700Bold',
-              fontSize: 18,
-              color: '#111827',
-              flex: 1
-            }}>
-              Daily Plan
-            </Text>
-            <Text style={{ fontSize: 16, color: '#6B7280' }}>⌄</Text>
+            <Pressable onPress={() => setShowDaily(!showDaily)} style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+              <Text style={{
+                fontFamily: 'Poppins_700Bold',
+                fontSize: 18,
+                color: '#111827',
+                flex: 1
+              }}>
+                Daily Plan
+              </Text>
+              <MaterialIcons name={showDaily ? 'keyboard-arrow-down' : 'keyboard-arrow-right'} size={20} color="#6B7280" />
+            </Pressable>
           </View>
 
-          {dailyPlans.length > 0 ? (
+          {showDaily && (dailyPlans.length > 0 ? (
             <View style={{ gap: 12 }}>
               {dailyPlans.map((plan) => (
                 <View key={plan.id} style={{
@@ -263,24 +284,28 @@ export default function Home() {
                   </View>
 
                   <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
-                    <Text style={{ fontSize: 24, marginRight: 12 }}>{plan.emoji}</Text>
-                    <View style={{ flex: 1 }}>
-                      <Text style={{
-                        fontFamily: 'Poppins_600SemiBold',
-                        fontSize: 16,
-                        color: '#111827',
-                        marginBottom: 4
-                      }}>
-                        {plan.name}
-                      </Text>
-                      <Text style={{
-                        fontFamily: 'Poppins_400Regular',
-                        fontSize: 12,
-                        color: '#6B7280'
-                      }}>
-                        {plan.start_time || '--'}-{plan.end_time || '--'} ({plan.duration_minutes}m)
-                      </Text>
-                    </View>
+                    <Pressable onPress={() => { setModalPlan(plan); setShowPlanModal(true); }} style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                      <Text style={{ fontSize: 24, marginRight: 12 }}>{plan.emoji}</Text>
+                      <View style={{ flex: 1 }}>
+                        <Text style={{
+                          fontFamily: 'Poppins_600SemiBold',
+                          fontSize: 16,
+                          color: '#111827',
+                          marginBottom: 4,
+                          textDecorationLine: plan.is_completed ? 'line-through' : 'none',
+                          textDecorationStyle: 'solid'
+                        }}>
+                          {plan.name}
+                        </Text>
+                        <Text style={{
+                          fontFamily: 'Poppins_400Regular',
+                          fontSize: 12,
+                          color: '#6B7280'
+                        }}>
+                          {plan.start_time || '--'}-{plan.end_time || '--'} ({plan.duration_minutes}m)
+                        </Text>
+                      </View>
+                    </Pressable>
                     <Pressable onPress={async () => {
                       const res = await apiService.togglePlanCompletion(plan.id);
                       if (res.success) { setConfettiAt(Date.now()); }
@@ -325,7 +350,7 @@ export default function Home() {
                 Tap + to add your first task
               </Text>
             </View>
-          )}
+          ))}
         </View>
 
         {/* Anytime Section */}
@@ -335,18 +360,20 @@ export default function Home() {
             alignItems: 'center',
             marginBottom: 10
           }}>
-            <Text style={{
-              fontFamily: 'Poppins_700Bold',
-              fontSize: 18,
-              color: '#111827',
-              flex: 1
-            }}>
-              Anytime
-            </Text>
-            <Text style={{ fontSize: 16, color: '#6B7280' }}>⌄</Text>
+            <Pressable onPress={() => setShowAnytime(!showAnytime)} style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+              <Text style={{
+                fontFamily: 'Poppins_700Bold',
+                fontSize: 18,
+                color: '#111827',
+                flex: 1
+              }}>
+                Anytime
+              </Text>
+              <MaterialIcons name={showAnytime ? 'keyboard-arrow-down' : 'keyboard-arrow-right'} size={20} color="#6B7280" />
+            </Pressable>
           </View>
 
-          {anytimePlans.length > 0 ? (
+          {showAnytime && (anytimePlans.length > 0 ? (
             <View style={{ gap: 12 }}>
               {anytimePlans.map((plan) => (
                 <View key={plan.id} style={{
@@ -358,15 +385,19 @@ export default function Home() {
                   borderWidth: 1,
                   borderColor: '#E5E7EB'
                 }}>
-                  <Text style={{ fontSize: 24, marginRight: 12 }}>{plan.emoji}</Text>
-                  <Text style={{
-                    fontFamily: 'Poppins_600SemiBold',
-                    fontSize: 16,
-                    color: '#111827',
-                    flex: 1
-                  }}>
-                    {plan.name}
-                  </Text>
+                  <Pressable onPress={() => { setModalPlan(plan); setShowPlanModal(true); }} style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                    <Text style={{ fontSize: 24, marginRight: 12 }}>{plan.emoji}</Text>
+                    <Text style={{
+                      fontFamily: 'Poppins_600SemiBold',
+                      fontSize: 16,
+                      color: '#111827',
+                      flex: 1,
+                      textDecorationLine: plan.is_completed ? 'line-through' : 'none',
+                      textDecorationStyle: 'solid'
+                    }}>
+                      {plan.name}
+                    </Text>
+                  </Pressable>
                   <Pressable onPress={async () => {
                     const res = await apiService.togglePlanCompletion(plan.id);
                     if (res.success) { setConfettiAt(Date.now()); }
@@ -402,7 +433,7 @@ export default function Home() {
                 Add tasks that can be done anytime
               </Text>
             </View>
-          )}
+          ))}
         </View>
       </ScrollView>
 
@@ -546,6 +577,53 @@ export default function Home() {
       )}
       {confettiAt && (
         <ConfettiCannon key={confettiAt} count={80} origin={{ x: width / 2, y: 0 }} fadeOut fallSpeed={3000} />
+      )}
+
+      {/* Plan Details Modal (read-only summary like screenshots) */}
+      {showPlanModal && modalPlan && (
+        <View style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          justifyContent: 'flex-end'
+        }}>
+          <View style={{ backgroundColor: 'white', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20 }}>
+            <View style={{ width: 40, height: 4, backgroundColor: '#D1D5DB', borderRadius: 2, alignSelf: 'center', marginBottom: 20 }} />
+
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
+              <Text style={{ fontSize: 28, marginRight: 10 }}>{modalPlan.emoji}</Text>
+              <Text style={{ fontFamily: 'Poppins_700Bold', fontSize: 18, color: '#111827', flex: 1 }}>{modalPlan.name}</Text>
+              <View style={{ width: 28, height: 28, borderRadius: 14, borderWidth: 2, borderColor: '#D1D5DB' }} />
+            </View>
+            <Text style={{ fontFamily: 'Poppins_400Regular', fontSize: 12, color: '#6B7280', marginBottom: 16 }}>
+              {modalPlan.start_time || '--'}-{modalPlan.end_time || '--'} ({modalPlan.duration_minutes} min)
+            </Text>
+
+            <View style={{ height: 1, backgroundColor: '#E5E7EB', marginBottom: 16 }} />
+            <Text style={{ fontFamily: 'Poppins_400Regular', fontSize: 12, color: '#6B7280', marginBottom: 12 }}>Checklist</Text>
+            <View style={{ backgroundColor: '#F9FAFB', borderRadius: 12, minHeight: 120, padding: 12, marginBottom: 16 }}>
+              {(modalPlan.checklist && modalPlan.checklist.length > 0) ? (
+                modalPlan.checklist.map((it: any) => (
+                  <View key={it.id} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                    <View style={{ width: 20, height: 20, borderRadius: 10, borderWidth: 2, borderColor: '#D1D5DB', marginRight: 8 }} />
+                    <Text style={{ fontFamily: 'Poppins_400Regular', fontSize: 14, color: '#111827' }}>{it.text}</Text>
+                  </View>
+                ))
+              ) : (
+                <Text style={{ fontFamily: 'Poppins_400Regular', fontSize: 14, color: '#9CA3AF' }}>No checklist</Text>
+              )}
+            </View>
+
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Pressable onPress={() => setShowPlanModal(false)} style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: '#374151', alignItems: 'center', justifyContent: 'center', alignSelf: 'center' }}>
+                <Text style={{ fontSize: 18, color: 'white' }}>✕</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
       )}
     </View>
   );

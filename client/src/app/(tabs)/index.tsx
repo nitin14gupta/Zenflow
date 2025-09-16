@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, Pressable, ScrollView, Dimensions } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { View, Text, Pressable, ScrollView, Dimensions, RefreshControl } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors } from '../../components/ui';
 import { useAuth } from '../../context/AuthContext';
@@ -17,22 +17,30 @@ export default function Home() {
   const [dailyPlans, setDailyPlans] = useState<any[]>([]);
   const [anytimePlans, setAnytimePlans] = useState<any[]>([]);
   const [confettiAt, setConfettiAt] = useState<number | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const loadPlans = useCallback(async () => {
+    if (!user?.id) return;
+    const res = await apiService.getUserPlans(user.id);
+    if (res.success) {
+      const plans = res.data.plans || res.data || [];
+      const selectedDateStr = selectedDate.toISOString().split('T')[0];
+      const todays = plans.filter((p: any) => p.scheduled_date === selectedDateStr && !p.is_anytime);
+      const anytimes = plans.filter((p: any) => p.scheduled_date === selectedDateStr && p.is_anytime);
+      setDailyPlans(todays);
+      setAnytimePlans(anytimes);
+    }
+  }, [user?.id, selectedDate]);
 
   useEffect(() => {
-    const loadPlans = async () => {
-      if (!user?.id) return;
-      const res = await apiService.getUserPlans(user.id);
-      if (res.success) {
-        const plans = res.data.plans || res.data || [];
-        const selectedDateStr = selectedDate.toISOString().split('T')[0];
-        const todays = plans.filter((p: any) => p.scheduled_date === selectedDateStr && !p.is_anytime);
-        const anytimes = plans.filter((p: any) => p.scheduled_date === selectedDateStr && p.is_anytime);
-        setDailyPlans(todays);
-        setAnytimePlans(anytimes);
-      }
-    };
     loadPlans();
-  }, [user?.id, selectedDate]);
+  }, [loadPlans]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await loadPlans();
+    setRefreshing(false);
+  }, [loadPlans]);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   const getCurrentDate = () => {
@@ -191,7 +199,9 @@ export default function Home() {
       </View>
 
       {/* Content */}
-      <ScrollView style={{ flex: 1, paddingHorizontal: 20 }}>
+      <ScrollView style={{ flex: 1, paddingHorizontal: 20 }} refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }>
         {/* Daily Plan Section */}
         <View style={{ marginBottom: 24 }}>
           <View style={{

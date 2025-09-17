@@ -42,7 +42,6 @@ const repeatOptions = [
     { id: '5', label: 'Weekly', value: 'weekly' },
     { id: '6', label: 'Every second week', value: 'biweekly' },
     { id: '7', label: 'Monthly', value: 'monthly' },
-    { id: '8', label: 'Custom', value: 'custom' }
 ];
 
 type ChecklistItem = {

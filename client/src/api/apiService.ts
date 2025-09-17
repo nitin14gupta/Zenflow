@@ -133,10 +133,10 @@ class ApiService {
         });
     }
 
-    async resetPassword(token: string, password: string): Promise<ApiResponse> {
+    async resetPasswordWithCode(email: string, code: string, password: string): Promise<ApiResponse> {
         return this.makeRequest(API_CONFIG.ENDPOINTS.AUTH.RESET_PASSWORD, {
             method: 'POST',
-            body: JSON.stringify({ token, password }),
+            body: JSON.stringify({ email, code, password }),
         });
     }
 

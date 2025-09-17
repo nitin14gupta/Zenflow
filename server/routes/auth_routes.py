@@ -136,26 +136,25 @@ def forgot_password():
         
         user_id = result.data[0]['id']
         
-        # Generate reset token
-        reset_token = auth_utils.generate_reset_token()
-        expires_at = datetime.utcnow() + timedelta(hours=1)
-        
-        # Store reset token
+        # Generate 6-digit code
+        reset_code = auth_utils.generate_numeric_code(6)
+        expires_at = datetime.utcnow() + timedelta(minutes=15)
+
+        # Store/Upsert reset token record as code
         token_data = {
             'user_id': user_id,
-            'token': reset_token,
+            'token': reset_code,
             'expires_at': expires_at.isoformat(),
             'used': False,
             'created_at': datetime.utcnow().isoformat()
         }
-        
         supabase.table('password_reset_tokens').insert(token_data).execute()
-        
-        # Send reset email
-        if email_service.send_password_reset_email(email, reset_token):
-            return jsonify({'message': 'Password reset link sent to your email'}), 200
+
+        # Send code via email
+        if email_service.send_password_reset_email(email, reset_code):
+            return jsonify({'message': 'Verification code sent to your email'}), 200
         else:
-            return jsonify({'error': 'Failed to send reset email'}), 500
+            return jsonify({'error': 'Failed to send verification code'}), 500
         
     except Exception as e:
         print(f"Forgot password error: {e}")
@@ -165,18 +164,25 @@ def forgot_password():
 def reset_password():
     try:
         data = request.get_json()
-        token = data.get('token', '').strip()
+        email = data.get('email', '').strip().lower()
+        token = data.get('code', '').strip()
         new_password = data.get('password', '')
         
-        if not token or not new_password:
-            return jsonify({'error': 'Token and new password are required'}), 400
+        if not email or not token or not new_password:
+            return jsonify({'error': 'Email, code and new password are required'}), 400
         
         if len(new_password) < 6:
             return jsonify({'error': 'Password must be at least 6 characters'}), 400
         
         # Find valid token
         supabase = db_config.get_client()
-        result = supabase.table('password_reset_tokens').select('*').eq('token', token).eq('used', False).execute()
+        # Find user by email
+        user_res = supabase.table('users').select('id,email').eq('email', email).execute()
+        if not user_res.data:
+            return jsonify({'error': 'Invalid email or code'}), 400
+        user_id = user_res.data[0]['id']
+
+        result = supabase.table('password_reset_tokens').select('*').eq('token', token).eq('user_id', user_id).eq('used', False).execute()
         
         if not result.data:
             return jsonify({'error': 'Invalid or expired reset token'}), 400

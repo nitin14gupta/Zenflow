@@ -12,6 +12,7 @@ export default function Settings() {
     const { showToast } = useToast();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [showAccountModal, setShowAccountModal] = useState(false);
 
     const handleLogout = async () => {
         await logout();
@@ -117,12 +118,12 @@ export default function Settings() {
                     <SettingItem
                         icon="👤"
                         title="Account"
-                        onPress={() => console.log('Account pressed')}
+                        onPress={() => setShowAccountModal(true)}
                     />
                     <SettingItem
                         icon="📄"
                         title="Subscription"
-                        onPress={() => console.log('Subscription pressed')}
+                        onPress={() => router.push('/(settings)/subscription')}
                     />
                 </View>
 
@@ -291,6 +292,39 @@ export default function Settings() {
                                 </Text>
                             </Pressable>
                         </View>
+                    </View>
+                </View>
+            )}
+            {/* Account Modal */}
+            {showAccountModal && (
+                <View style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: 'rgba(0,0,0,0.5)',
+                    justifyContent: 'flex-end'
+                }}>
+                    <Pressable style={{ flex: 1 }} onPress={() => setShowAccountModal(false)} />
+                    <View style={{ backgroundColor: 'white', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20 }}>
+                        <View style={{ width: 40, height: 4, backgroundColor: '#D1D5DB', borderRadius: 2, alignSelf: 'center', marginBottom: 20 }} />
+
+                        <Pressable
+                            onPress={() => { setShowAccountModal(false); router.push('/(auth)/forgot'); }}
+                            style={{ backgroundColor: 'white', borderWidth: 1, borderColor: '#E5E7EB', borderRadius: 24, paddingVertical: 16, alignItems: 'center', marginBottom: 16 }}
+                        >
+                            <Text style={{ fontFamily: 'Poppins_700Bold', fontSize: 16, color: '#111827' }}>Change Password</Text>
+                        </Pressable>
+
+                        <Pressable
+                            onPress={() => { setShowAccountModal(false); setShowDeleteModal(true); }}
+                            style={{ backgroundColor: 'white', borderWidth: 1, borderColor: '#E5E7EB', borderRadius: 24, paddingVertical: 16, alignItems: 'center' }}
+                        >
+                            <Text style={{ fontFamily: 'Poppins_700Bold', fontSize: 16, color: '#111827' }}>Request Account Deletion</Text>
+                        </Pressable>
+
+                        <Text style={{ textAlign: 'center', color: '#9CA3AF', marginTop: 16, fontFamily: 'Poppins_400Regular', fontSize: 12 }}>Version 2.0.31444{"\n"}User settings</Text>
                     </View>
                 </View>
             )}

@@ -49,6 +49,11 @@ class AuthUtils:
         """Generate a secure reset token"""
         return ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(32))
     
+    def generate_numeric_code(self, digits: int = 6) -> str:
+        """Generate a numeric OTP code with fixed length"""
+        alphabet = string.digits
+        return ''.join(secrets.choice(alphabet) for _ in range(max(4, digits)))
+    
     def is_valid_email(self, email: str) -> bool:
         """Basic email validation"""
         import re

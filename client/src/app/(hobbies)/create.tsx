@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Pressable, ScrollView, TextInput, StatusBar } from 'react-native';
 // import { colors } from '../../components/ui';
 import { useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const suggestions = [
     { id: '1', emoji: '👗', title: 'Organize wardrobe' },
@@ -28,7 +29,7 @@ export default function CreatePlan() {
     };
 
     return (
-        <View style={{ flex: 1, backgroundColor: '#F0F9FF' }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#F0F9FF' }}>
             <StatusBar barStyle="dark-content" backgroundColor="#F0F9FF" />
 
             {/* Header */}
@@ -158,6 +159,6 @@ export default function CreatePlan() {
                     </Text>
                 </Pressable>
             </ScrollView>
-        </View>
+        </SafeAreaView>
     );
 }

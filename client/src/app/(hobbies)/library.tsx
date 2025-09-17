@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { apiService } from '../../api/apiService';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Packs shown as large image cards
 // Images reference app assets; replace with real artwork when available
@@ -14,7 +15,7 @@ type HabitPack = {
     title: string;
     subtitle: string;
     description: string;
-    image: any; // require() reference to local asset
+    image: any; // require() reference to local asset or {uri}
     habits: HabitItem[];
 };
 
@@ -25,7 +26,7 @@ const habitPacks: HabitPack[] = [
         subtitle: 'Start the day with joy',
         description:
             'A perfect morning routine is a great way to help you start your day with joy and balance.',
-        image: require('../../../assets/images/splash-icon.png'),
+        image: { uri: 'https://images.unsplash.com/photo-1633876841461-772d2b0b0e39?q=80&w=831&auto=format&fit=crop' },
         habits: [
             { id: 'h-1', title: 'Wake up early', emoji: '⏰' },
             { id: 'h-2', title: 'Drink a glass of water', emoji: '🥛' },
@@ -41,7 +42,7 @@ const habitPacks: HabitPack[] = [
         title: 'Digital Detox',
         subtitle: 'Unplug from devices',
         description: 'Reduce screen time and reclaim your focus throughout the day.',
-        image: require('../../../assets/images/icon.png'),
+        image: { uri: 'https://images.unsplash.com/photo-1633876841461-772d2b0b0e39?q=80&w=831&auto=format&fit=crop' },
         habits: [
             { id: 'h-8', title: 'No phone for first hour', emoji: '📵' },
             { id: 'h-9', title: 'Disable non‑essential notifications', emoji: '🔕' },
@@ -53,11 +54,48 @@ const habitPacks: HabitPack[] = [
         title: 'Clean Home, Clean Mind',
         subtitle: 'Create a consistent routine',
         description: 'Simple chores to keep your space tidy and your mind calm.',
-        image: require('../../../assets/images/android-icon-foreground.png'),
+        image: { uri: 'https://images.unsplash.com/photo-1633876841461-772d2b0b0e39?q=80&w=831&auto=format&fit=crop' },
         habits: [
             { id: 'h-11', title: 'Tidy desk', emoji: '🧹' },
             { id: 'h-12', title: 'Quick vacuum', emoji: '🧼' },
             { id: 'h-13', title: 'Wipe counters', emoji: '🧽' },
+        ],
+    },
+    // New packs (Unsplash images)
+    {
+        id: 'pack-4',
+        title: 'Get In Shape & Feel Great',
+        subtitle: 'Exercise and food habits',
+        description: 'Build momentum with simple everyday moves and smart nutrition.',
+        image: { uri: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=1200&auto=format&fit=crop' },
+        habits: [
+            { id: 'h-14', title: '10,000 steps', emoji: '🚶‍♂️' },
+            { id: 'h-15', title: 'Stretch for 10 minutes', emoji: '🤸‍♀️' },
+            { id: 'h-16', title: 'Track protein intake', emoji: '🥗' },
+        ],
+    },
+    {
+        id: 'pack-5',
+        title: 'Skin Care Day',
+        subtitle: 'Take care of yourself',
+        description: 'Gentle routines for healthy skin and self‑care.',
+        image: { uri: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=1200&auto=format&fit=crop' },
+        habits: [
+            { id: 'h-17', title: 'Cleanse and moisturize', emoji: '🧴' },
+            { id: 'h-18', title: 'Sunscreen daily', emoji: '🌞' },
+            { id: 'h-19', title: 'Hydration check', emoji: '💧' },
+        ],
+    },
+    {
+        id: 'pack-6',
+        title: 'Mastering ADHD',
+        subtitle: 'Structured Focus',
+        description: 'Reduce friction with small, reliable routines that boost focus.',
+        image: { uri: 'https://images.unsplash.com/photo-1516387938699-a93567ec168e?q=80&w=1200&auto=format&fit=crop' },
+        habits: [
+            { id: 'h-20', title: 'Plan the day in 5 minutes', emoji: '📝' },
+            { id: 'h-21', title: 'Single‑task focus block', emoji: '🎯' },
+            { id: 'h-22', title: 'Declutter one small area', emoji: '🧺' },
         ],
     },
 ];
@@ -113,7 +151,7 @@ export default function HabitLibrary() {
     };
 
     return (
-        <View style={{ flex: 1, backgroundColor: '#F0F9FF' }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#F0F9FF' }}>
             <StatusBar barStyle="dark-content" backgroundColor="#F0F9FF" />
 
             {/* Header */}
@@ -255,6 +293,6 @@ export default function HabitLibrary() {
                     </View>
                 </View>
             </Modal>
-        </View>
+        </SafeAreaView>
     );
 }

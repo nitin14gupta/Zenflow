@@ -5,6 +5,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { apiService } from '../../api/apiService';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const colorOptions = [
     { id: '1', color: '#F1EFF7', name: 'Lavender' },
@@ -211,7 +212,7 @@ export default function PlanDetails() {
     };
 
     return (
-        <View style={{ flex: 1, backgroundColor: selectedColor.color }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: selectedColor.color }}>
             <StatusBar barStyle="dark-content" backgroundColor={selectedColor.color} />
 
             {/* Header */}
@@ -1094,6 +1095,6 @@ export default function PlanDetails() {
                     </View>
                 </View>
             </Modal>
-        </View>
+        </SafeAreaView>
     );
 }

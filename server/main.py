@@ -6,7 +6,6 @@ import asyncio
 from db.config import db_config
 from routes.auth_routes import auth_bp
 from routes.plan_routes import plan_bp
-from routes.payment_routes import payments_bp
 
 # Load environment variables
 load_dotenv()
@@ -20,7 +19,6 @@ def create_app():
     # Register blueprints
     app.register_blueprint(auth_bp)
     app.register_blueprint(plan_bp)
-    app.register_blueprint(payments_bp)
     
     # Health check endpoint
     @app.route('/api/health', methods=['GET'])

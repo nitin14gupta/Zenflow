@@ -23,7 +23,12 @@ export default function Welcome() {
             </View>
             <Title>Yay, glad you are here!</Title>
             <Subtitle>We'll help you with self-growth. First, let's dive into your personality and tailor your personal plan.</Subtitle>
-            <Image source={require('../../../assets/images/icon.png')} style={{ width: 300, height: 300 }} />
+            <View style={{ alignItems: 'center', marginVertical: 16 }}>
+                <Image
+                    source={{ uri: "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=800&q=80&auto=format&fit=crop" }}
+                    style={{ width: '100%', height: 200, borderRadius: 16 }}
+                />
+            </View>
             <View style={{ flex: 1 }} />
             <Button onPress={() => router.push("/(onboarding)/sleep")}>Continue</Button>
         </ScreenContainer>

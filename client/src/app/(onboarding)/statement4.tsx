@@ -15,9 +15,12 @@ export default function Statement4() {
     return (
         <ScreenContainer>
             <ProgressBar progress={17 / 19} />
-            <Title>Do you relate to this statement?</Title>
-            <Subtitle>😥 At the end of the day, I regret that I could have done more things</Subtitle>
-            <View style={{ flex: 1 }} />
+            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ alignItems: 'center', paddingHorizontal: 8 }}>
+                    <Title>Do you relate to this statement?</Title>
+                    <Subtitle>😥 At the end of the day, I regret that I could have done more things</Subtitle>
+                </View>
+            </View>
             <View style={{ gap: 12 }}>
                 <Button variant="secondary" onPress={() => onPick(false)}>No</Button>
                 <Button onPress={() => onPick(true)}>Yes</Button>

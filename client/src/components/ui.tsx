@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useRef } from "react";
+import React, { PropsWithChildren, useEffect, useRef } from "react";
 import { Pressable, Text, View, ViewProps, Animated } from "react-native";
 import * as Haptics from "expo-haptics";
 
@@ -13,10 +13,20 @@ export const colors = {
 };
 
 export const ScreenContainer: React.FC<PropsWithChildren<{ style?: ViewProps["style"] }>> = ({ children, style }) => {
+    const opacity = useRef(new Animated.Value(0)).current;
+    const translateY = useRef(new Animated.Value(10)).current;
+
+    useEffect(() => {
+        Animated.parallel([
+            Animated.timing(opacity, { toValue: 1, duration: 300, useNativeDriver: true }),
+            Animated.spring(translateY, { toValue: 0, useNativeDriver: true, friction: 6 }),
+        ]).start();
+    }, [opacity, translateY]);
+
     return (
-        <View style={[{ flex: 1, backgroundColor: colors.cream, paddingHorizontal: 20, paddingTop: 48, paddingBottom: 24 }, style]}>
+        <Animated.View style={[{ flex: 1, backgroundColor: colors.cream, paddingHorizontal: 20, paddingTop: 48, paddingBottom: 24, opacity, transform: [{ translateY }] }, style]}>
             {children}
-        </View>
+        </Animated.View>
     );
 };
 

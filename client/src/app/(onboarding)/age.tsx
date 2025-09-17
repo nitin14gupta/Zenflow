@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Text, View } from "react-native";
-import { Button, CardOption, ProgressBar, ScreenContainer, Title } from "../../components/ui";
+import { Text, View, Pressable } from "react-native";
+import { Button, CardOption, ProgressBar, ScreenContainer, Title, colors } from "../../components/ui";
 import { useOnboarding } from "../../context/OnboardingContext";
 import { useRouter } from "expo-router";
 
@@ -29,6 +29,12 @@ export default function Age() {
             <Button onPress={onNext}>
                 Continue
             </Button>
+            <View style={{ alignItems: "center", marginTop: 12 }}>
+                <Text style={{ color: "#6B7280", fontSize: 14, fontFamily: "Poppins_400Regular", marginBottom: 6 }}>or</Text>
+                <Pressable onPress={() => router.replace("/(auth)/login")}>
+                    <Text style={{ color: colors.purple, fontFamily: "Poppins_600SemiBold", fontSize: 16 }}>Log In</Text>
+                </Pressable>
+            </View>
         </ScreenContainer>
     );
 }

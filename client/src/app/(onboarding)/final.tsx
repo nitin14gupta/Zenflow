@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
-import { Text, View } from "react-native";
-import { Button, ProgressBar, ScreenContainer, Title } from "../../components/ui";
+import { Text, View, Pressable } from "react-native";
+import { Button, ProgressBar, ScreenContainer, Title, Subtitle, colors } from "../../components/ui";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { useRouter } from "expo-router";
 
@@ -19,11 +19,16 @@ export default function Final() {
     return (
         <ScreenContainer>
             <ProgressBar progress={19 / 19} />
-            <View style={{ alignItems: 'center', marginTop: 24 }}>
-                <Title>Are you ready?</Title>
+            <View style={{ alignItems: 'center', marginTop: 16 }}>
+                <Text style={{ fontSize: 48, marginBottom: 8 }}>🎉</Text>
+                <Title>You’re all set!</Title>
+                <Subtitle>Create your account to save progress and unlock your plan.</Subtitle>
             </View>
             <View style={{ flex: 1 }} />
-            <Button onPress={() => router.replace("/(auth)/register")}>Let's Go!</Button>
+            <View style={{ gap: 12 }}>
+                <Button onPress={() => router.replace("/(auth)/register")}>Create Account</Button>
+                <Button variant="secondary" onPress={() => router.replace("/(auth)/login")}>I already have an account</Button>
+            </View>
             <ConfettiCannon ref={confettiRef as any} count={150} origin={{ x: 0, y: 0 }} fadeOut autoStart={false} />
         </ScreenContainer>
     );

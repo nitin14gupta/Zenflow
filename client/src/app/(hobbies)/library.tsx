@@ -26,7 +26,7 @@ const habitPacks: HabitPack[] = [
         subtitle: 'Start the day with joy',
         description:
             'A perfect morning routine is a great way to help you start your day with joy and balance.',
-        image: { uri: 'https://images.unsplash.com/photo-1633876841461-772d2b0b0e39?q=80&w=831&auto=format&fit=crop' },
+        image: require('../../../assets/images/habitLib1.png'),
         habits: [
             { id: 'h-1', title: 'Wake up early', emoji: '⏰' },
             { id: 'h-2', title: 'Drink a glass of water', emoji: '🥛' },
@@ -42,7 +42,7 @@ const habitPacks: HabitPack[] = [
         title: 'Digital Detox',
         subtitle: 'Unplug from devices',
         description: 'Reduce screen time and reclaim your focus throughout the day.',
-        image: { uri: 'https://images.unsplash.com/photo-1633876841461-772d2b0b0e39?q=80&w=831&auto=format&fit=crop' },
+        image: require('../../../assets/images/habitLib2.png'),
         habits: [
             { id: 'h-8', title: 'No phone for first hour', emoji: '📵' },
             { id: 'h-9', title: 'Disable non‑essential notifications', emoji: '🔕' },
@@ -54,20 +54,19 @@ const habitPacks: HabitPack[] = [
         title: 'Clean Home, Clean Mind',
         subtitle: 'Create a consistent routine',
         description: 'Simple chores to keep your space tidy and your mind calm.',
-        image: { uri: 'https://images.unsplash.com/photo-1633876841461-772d2b0b0e39?q=80&w=831&auto=format&fit=crop' },
+        image: require('../../../assets/images/habitLib3.png'),
         habits: [
             { id: 'h-11', title: 'Tidy desk', emoji: '🧹' },
             { id: 'h-12', title: 'Quick vacuum', emoji: '🧼' },
             { id: 'h-13', title: 'Wipe counters', emoji: '🧽' },
         ],
     },
-    // New packs (Unsplash images)
     {
         id: 'pack-4',
         title: 'Get In Shape & Feel Great',
         subtitle: 'Exercise and food habits',
         description: 'Build momentum with simple everyday moves and smart nutrition.',
-        image: { uri: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=1200&auto=format&fit=crop' },
+        image: require('../../../assets/images/habitLib4.png'),
         habits: [
             { id: 'h-14', title: '10,000 steps', emoji: '🚶‍♂️' },
             { id: 'h-15', title: 'Stretch for 10 minutes', emoji: '🤸‍♀️' },
@@ -79,7 +78,7 @@ const habitPacks: HabitPack[] = [
         title: 'Skin Care Day',
         subtitle: 'Take care of yourself',
         description: 'Gentle routines for healthy skin and self‑care.',
-        image: { uri: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=1200&auto=format&fit=crop' },
+        image: require('../../../assets/images/habitLib5.png'),
         habits: [
             { id: 'h-17', title: 'Cleanse and moisturize', emoji: '🧴' },
             { id: 'h-18', title: 'Sunscreen daily', emoji: '🌞' },
@@ -91,7 +90,7 @@ const habitPacks: HabitPack[] = [
         title: 'Mastering ADHD',
         subtitle: 'Structured Focus',
         description: 'Reduce friction with small, reliable routines that boost focus.',
-        image: { uri: 'https://images.unsplash.com/photo-1516387938699-a93567ec168e?q=80&w=1200&auto=format&fit=crop' },
+        image: require('../../../assets/images/habitLib6.png'),
         habits: [
             { id: 'h-20', title: 'Plan the day in 5 minutes', emoji: '📝' },
             { id: 'h-21', title: 'Single‑task focus block', emoji: '🎯' },

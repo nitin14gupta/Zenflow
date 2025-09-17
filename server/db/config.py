@@ -99,6 +99,7 @@ class DatabaseConfig:
                     checklist JSONB DEFAULT '[]',
                     notes TEXT DEFAULT '',
                     is_completed BOOLEAN DEFAULT FALSE,
+                    is_skipped BOOLEAN DEFAULT FALSE,
                     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
                     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
                 );

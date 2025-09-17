@@ -55,6 +55,7 @@ export default function Home() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showPlanModal, setShowPlanModal] = useState(false);
   const [modalPlan, setModalPlan] = useState<any | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const getCurrentDate = () => {
     const today = new Date();
@@ -104,6 +105,50 @@ export default function Home() {
   const handleHabitLibrary = () => {
     setShowCreateModal(false);
     router.push('/(hobbies)/library');
+  };
+
+  const handleSkipPlan = async (planId: string) => {
+    setIsLoading(true);
+    try {
+      const res = await apiService.skipPlan(planId);
+      if (res.success) {
+        await loadPlans();
+        setShowPlanModal(false);
+      }
+    } catch (error) {
+      console.error('Error skipping plan:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeletePlan = async (planId: string) => {
+    setIsLoading(true);
+    try {
+      const res = await apiService.deletePlan(planId);
+      if (res.success) {
+        await loadPlans();
+        setShowPlanModal(false);
+      }
+    } catch (error) {
+      console.error('Error deleting plan:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleEditPlan = () => {
+    if (modalPlan) {
+      setShowPlanModal(false);
+      router.push({
+        pathname: '/(hobbies)/details',
+        params: {
+          planName: modalPlan.name,
+          planId: modalPlan.id,
+          isEdit: 'true'
+        }
+      });
+    }
   };
 
   return (
@@ -290,23 +335,25 @@ export default function Home() {
                         <Text style={{
                           fontFamily: 'Poppins_600SemiBold',
                           fontSize: 16,
-                          color: '#111827',
+                          color: plan.is_skipped ? '#9CA3AF' : '#111827',
                           marginBottom: 4,
                           textDecorationLine: plan.is_completed ? 'line-through' : 'none',
                           textDecorationStyle: 'solid'
                         }}>
                           {plan.name}
+                          {plan.is_skipped && ' (Skipped)'}
                         </Text>
                         <Text style={{
                           fontFamily: 'Poppins_400Regular',
                           fontSize: 12,
-                          color: '#6B7280'
+                          color: plan.is_skipped ? '#9CA3AF' : '#6B7280'
                         }}>
                           {plan.start_time || '--'}-{plan.end_time || '--'} ({plan.duration_minutes}m)
                         </Text>
                       </View>
                     </Pressable>
                     <Pressable onPress={async () => {
+                      if (plan.is_completed) return;
                       const res = await apiService.togglePlanCompletion(plan.id);
                       if (res.success) { setConfettiAt(Date.now()); }
                     }} style={{
@@ -314,12 +361,14 @@ export default function Home() {
                       height: 24,
                       borderRadius: 12,
                       borderWidth: 2,
-                      borderColor: '#D1D5DB',
+                      borderColor: plan.is_completed ? '#10B981' : '#D1D5DB',
+                      backgroundColor: plan.is_completed ? '#10B981' : 'transparent',
                       alignItems: 'center',
-                      justifyContent: 'center'
+                      justifyContent: 'center',
+                      opacity: plan.is_completed ? 1 : 1
                     }}>
                       {plan.is_completed && (
-                        <Text style={{ fontSize: 12, color: '#10B981' }}>✓</Text>
+                        <Text style={{ fontSize: 12, color: 'white' }}>✓</Text>
                       )}
                     </Pressable>
                   </View>
@@ -390,21 +439,30 @@ export default function Home() {
                     <Text style={{
                       fontFamily: 'Poppins_600SemiBold',
                       fontSize: 16,
-                      color: '#111827',
+                      color: plan.is_skipped ? '#9CA3AF' : '#111827',
                       flex: 1,
                       textDecorationLine: plan.is_completed ? 'line-through' : 'none',
                       textDecorationStyle: 'solid'
                     }}>
                       {plan.name}
+                      {plan.is_skipped && ' (Skipped)'}
                     </Text>
                   </Pressable>
                   <Pressable onPress={async () => {
+                    if (plan.is_completed) return;
                     const res = await apiService.togglePlanCompletion(plan.id);
                     if (res.success) { setConfettiAt(Date.now()); }
                   }} style={{
-                    width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: '#D1D5DB', alignItems: 'center', justifyContent: 'center'
+                    width: 24,
+                    height: 24,
+                    borderRadius: 12,
+                    borderWidth: 2,
+                    borderColor: plan.is_completed ? '#10B981' : '#D1D5DB',
+                    backgroundColor: plan.is_completed ? '#10B981' : 'transparent',
+                    alignItems: 'center',
+                    justifyContent: 'center'
                   }}>
-                    {plan.is_completed && (<Text style={{ fontSize: 12, color: '#10B981' }}>✓</Text>)}
+                    {plan.is_completed && (<Text style={{ fontSize: 12, color: 'white' }}>✓</Text>)}
                   </Pressable>
                 </View>
               ))}
@@ -581,26 +639,74 @@ export default function Home() {
 
       {/* Plan Details Modal (read-only summary like screenshots) */}
       {showPlanModal && modalPlan && (
-        <View style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          justifyContent: 'flex-end'
-        }}>
-          <View style={{ backgroundColor: 'white', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20 }}>
+        <Pressable
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            justifyContent: 'flex-end'
+          }}
+          onPress={() => setShowPlanModal(false)}
+        >
+          <Pressable
+            style={{ backgroundColor: 'white', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20 }}
+            onPress={(e) => e.stopPropagation()}
+          >
             <View style={{ width: 40, height: 4, backgroundColor: '#D1D5DB', borderRadius: 2, alignSelf: 'center', marginBottom: 20 }} />
 
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
               <Text style={{ fontSize: 28, marginRight: 10 }}>{modalPlan.emoji}</Text>
-              <Text style={{ fontFamily: 'Poppins_700Bold', fontSize: 18, color: '#111827', flex: 1 }}>{modalPlan.name}</Text>
-              <View style={{ width: 28, height: 28, borderRadius: 14, borderWidth: 2, borderColor: '#D1D5DB' }} />
+              <Text style={{
+                fontFamily: 'Poppins_700Bold',
+                fontSize: 18,
+                color: '#111827',
+                flex: 1,
+                textDecorationLine: modalPlan.is_completed ? 'line-through' : 'none',
+                textDecorationStyle: 'solid'
+              }}>{modalPlan.name}</Text>
+              <View style={{
+                width: 28,
+                height: 28,
+                borderRadius: 14,
+                borderWidth: 2,
+                borderColor: modalPlan.is_completed ? '#10B981' : '#D1D5DB',
+                backgroundColor: modalPlan.is_completed ? '#10B981' : 'transparent',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                {modalPlan.is_completed && (
+                  <Text style={{ fontSize: 12, color: 'white' }}>✓</Text>
+                )}
+              </View>
             </View>
             <Text style={{ fontFamily: 'Poppins_400Regular', fontSize: 12, color: '#6B7280', marginBottom: 16 }}>
               {modalPlan.start_time || '--'}-{modalPlan.end_time || '--'} ({modalPlan.duration_minutes} min)
             </Text>
+
+            {/* Repeat and Reminder Info */}
+            <View style={{ flexDirection: 'row', marginBottom: 16, gap: 16 }}>
+              <View style={{ flex: 1, backgroundColor: '#F9FAFB', borderRadius: 8, padding: 8, alignItems: 'center' }}>
+                <Text style={{ fontFamily: 'Poppins_400Regular', fontSize: 10, color: '#6B7280', marginBottom: 2 }}>Repeat</Text>
+                <Text style={{ fontFamily: 'Poppins_600SemiBold', fontSize: 12, color: '#111827' }}>
+                  {modalPlan.repeat_type === 'once' ? 'Once' :
+                    modalPlan.repeat_type === 'daily' ? 'Daily' :
+                      modalPlan.repeat_type === 'weekly' ? 'Weekly' :
+                        modalPlan.repeat_type === 'monthly' ? 'Monthly' : modalPlan.repeat_type}
+                </Text>
+              </View>
+              <View style={{ flex: 1, backgroundColor: '#F9FAFB', borderRadius: 8, padding: 8, alignItems: 'center' }}>
+                <Text style={{ fontFamily: 'Poppins_400Regular', fontSize: 10, color: '#6B7280', marginBottom: 2 }}>Reminders</Text>
+                <Text style={{ fontFamily: 'Poppins_600SemiBold', fontSize: 12, color: '#111827' }}>
+                  {modalPlan.reminder_at_start ? 'Start' : ''}
+                  {modalPlan.reminder_at_start && modalPlan.reminder_at_end ? ', ' : ''}
+                  {modalPlan.reminder_at_end ? 'End' : ''}
+                  {!modalPlan.reminder_at_start && !modalPlan.reminder_at_end ? 'None' : ''}
+                </Text>
+              </View>
+            </View>
 
             <View style={{ height: 1, backgroundColor: '#E5E7EB', marginBottom: 16 }} />
             <Text style={{ fontFamily: 'Poppins_400Regular', fontSize: 12, color: '#6B7280', marginBottom: 12 }}>Checklist</Text>
@@ -608,8 +714,28 @@ export default function Home() {
               {(modalPlan.checklist && modalPlan.checklist.length > 0) ? (
                 modalPlan.checklist.map((it: any) => (
                   <View key={it.id} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-                    <View style={{ width: 20, height: 20, borderRadius: 10, borderWidth: 2, borderColor: '#D1D5DB', marginRight: 8 }} />
-                    <Text style={{ fontFamily: 'Poppins_400Regular', fontSize: 14, color: '#111827' }}>{it.text}</Text>
+                    <View style={{
+                      width: 20,
+                      height: 20,
+                      borderRadius: 10,
+                      borderWidth: 2,
+                      borderColor: it.completed ? '#10B981' : '#D1D5DB',
+                      backgroundColor: it.completed ? '#10B981' : 'transparent',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginRight: 8
+                    }}>
+                      {it.completed && (
+                        <Text style={{ fontSize: 10, color: 'white' }}>✓</Text>
+                      )}
+                    </View>
+                    <Text style={{
+                      fontFamily: 'Poppins_400Regular',
+                      fontSize: 14,
+                      color: '#111827',
+                      textDecorationLine: it.completed ? 'line-through' : 'none',
+                      textDecorationStyle: 'solid'
+                    }}>{it.text}</Text>
                   </View>
                 ))
               ) : (
@@ -617,13 +743,64 @@ export default function Home() {
               )}
             </View>
 
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Pressable onPress={() => setShowPlanModal(false)} style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: '#374151', alignItems: 'center', justifyContent: 'center', alignSelf: 'center' }}>
-                <Text style={{ fontSize: 18, color: 'white' }}>✕</Text>
+            {/* Action Buttons */}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 12 }}>
+              {!modalPlan.is_completed && (
+                <>
+                  <Pressable
+                    onPress={() => handleSkipPlan(modalPlan.id)}
+                    disabled={isLoading}
+                    style={{
+                      flex: 1,
+                      height: 48,
+                      borderRadius: 12,
+                      backgroundColor: '#F59E0B',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      opacity: isLoading ? 0.7 : 1
+                    }}
+                  >
+                    <Text style={{ fontFamily: 'Poppins_600SemiBold', fontSize: 14, color: 'white' }}>
+                      {isLoading ? '...' : 'Skip'}
+                    </Text>
+                  </Pressable>
+
+                  <Pressable
+                    onPress={handleEditPlan}
+                    style={{
+                      flex: 1,
+                      height: 48,
+                      borderRadius: 12,
+                      backgroundColor: '#3B82F6',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <Text style={{ fontFamily: 'Poppins_600SemiBold', fontSize: 14, color: 'white' }}>Edit</Text>
+                  </Pressable>
+                </>
+              )}
+
+              <Pressable
+                onPress={() => handleDeletePlan(modalPlan.id)}
+                disabled={isLoading}
+                style={{
+                  flex: 1,
+                  height: 48,
+                  borderRadius: 12,
+                  backgroundColor: '#EF4444',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  opacity: isLoading ? 0.7 : 1
+                }}
+              >
+                <Text style={{ fontFamily: 'Poppins_600SemiBold', fontSize: 14, color: 'white' }}>
+                  {isLoading ? '...' : 'Delete'}
+                </Text>
               </Pressable>
             </View>
-          </View>
-        </View>
+          </Pressable>
+        </Pressable>
       )}
     </View>
   );

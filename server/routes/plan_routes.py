@@ -206,6 +206,48 @@ def toggle_plan_completion(plan_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@plan_bp.route('/<plan_id>/skip', methods=['PUT'])
+def skip_plan(plan_id):
+    try:
+        token = request.headers.get('Authorization', '').replace('Bearer ', '')
+        
+        if not token:
+            return jsonify({'error': 'No token provided'}), 401
+        
+        # Verify token
+        user_data = auth_utils.decode_jwt_token(token)
+        if not user_data:
+            return jsonify({'error': 'Invalid token'}), 401
+        
+        # Get current plan
+        result = db_config.supabase.table('daily_plans').select('is_completed, is_skipped').eq('id', plan_id).eq('user_id', user_data.get('user_id')).execute()
+        
+        if not result.data:
+            return jsonify({'error': 'Plan not found'}), 404
+        
+        # Check if plan is completed
+        if result.data[0]['is_completed']:
+            return jsonify({'error': 'Cannot skip completed plan'}), 400
+        
+        # Toggle skip status
+        new_skip_status = not result.data[0]['is_skipped']
+        update_result = db_config.supabase.table('daily_plans').update({
+            'is_skipped': new_skip_status,
+            'updated_at': datetime.utcnow().isoformat()
+        }).eq('id', plan_id).eq('user_id', user_data.get('user_id')).execute()
+        
+        if update_result.data:
+            return jsonify({
+                'success': True,
+                'message': f'Plan {"skipped" if new_skip_status else "unskipped"}',
+                'is_skipped': new_skip_status
+            }), 200
+        else:
+            return jsonify({'error': 'Failed to update plan'}), 500
+            
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @plan_bp.route('/delete-all', methods=['DELETE'])
 def delete_all_plans():
     try:

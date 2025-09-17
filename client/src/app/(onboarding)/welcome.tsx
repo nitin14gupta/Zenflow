@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Animated, Text, View } from "react-native";
+import { Animated, Image, Text, View } from "react-native";
 import { Button, ProgressBar, ScreenContainer, Subtitle, Title } from "../../components/ui";
 import { useRouter } from "expo-router";
 
@@ -23,6 +23,7 @@ export default function Welcome() {
             </View>
             <Title>Yay, glad you are here!</Title>
             <Subtitle>We'll help you with self-growth. First, let's dive into your personality and tailor your personal plan.</Subtitle>
+            <Image source={require('../../../assets/images/icon.png')} style={{ width: 300, height: 300 }} />
             <View style={{ flex: 1 }} />
             <Button onPress={() => router.push("/(onboarding)/sleep")}>Continue</Button>
         </ScreenContainer>

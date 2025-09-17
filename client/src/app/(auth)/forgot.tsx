@@ -7,7 +7,7 @@ import apiService from "../../api/apiService";
 
 export default function Forgot() {
     const router = useRouter();
-    const { show } = useToast();
+    const { showToast } = useToast();
     const [email, setEmail] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [emailSent, setEmailSent] = useState(false);
@@ -17,7 +17,7 @@ export default function Forgot() {
 
     const onSubmit = async () => {
         if (!canSubmit) {
-            if (!emailValid) show("Please enter a valid email address", "error");
+            if (!emailValid) showToast("Please enter a valid email address", "error");
             return;
         }
 
@@ -27,12 +27,12 @@ export default function Forgot() {
 
             if (response.success) {
                 setEmailSent(true);
-                show("Reset link sent to your email! 📧", "success");
+                showToast("Reset link sent to your email! 📧", "success");
             } else {
-                show(response.error || "Failed to send reset link", "error");
+                showToast(response.error || "Failed to send reset link", "error");
             }
         } catch (error) {
-            show("Network error. Please check your connection.", "error");
+            showToast("Network error. Please check your connection.", "error");
         } finally {
             setIsLoading(false);
         }

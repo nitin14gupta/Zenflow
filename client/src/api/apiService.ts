@@ -214,6 +214,12 @@ class ApiService {
         });
     }
 
+    async skipPlan(planId: string): Promise<ApiResponse> {
+        return this.makeRequest(`/api/plans/${planId}/skip`, {
+            method: 'PUT',
+        });
+    }
+
     async deleteAllPlans(): Promise<ApiResponse> {
         return this.makeRequest('/api/plans/delete-all', {
             method: 'DELETE',

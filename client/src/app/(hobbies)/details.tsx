@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Pressable, ScrollView, TextInput, StatusBar, Modal } from 'react-native';
 import { colors } from '../../components/ui';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -52,7 +52,7 @@ type ChecklistItem = {
 
 export default function PlanDetails() {
     const router = useRouter();
-    const { planName } = useLocalSearchParams();
+    const { planName, planId, isEdit } = useLocalSearchParams();
     const { user } = useAuth();
     const { showToast } = useToast();
 
@@ -82,6 +82,48 @@ export default function PlanDetails() {
     const [showEmojiModal, setShowEmojiModal] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [showDateModal, setShowDateModal] = useState(false);
+    const [isEditMode, setIsEditMode] = useState(isEdit === 'true');
+    const [existingPlan, setExistingPlan] = useState<any>(null);
+    const [isCompleted, setIsCompleted] = useState(false);
+
+    // Load existing plan data when in edit mode
+    useEffect(() => {
+        const loadExistingPlan = async () => {
+            if (isEditMode && planId) {
+                try {
+                    const response = await apiService.getUserPlans(user?.id || '');
+                    if (response.success && response.data?.plans) {
+                        const plan = response.data.plans.find((p: any) => p.id === planId);
+                        if (plan) {
+                            setExistingPlan(plan);
+                            setIsCompleted(plan.is_completed || false);
+                            // Populate form with existing data
+                            setSelectedColor(colorOptions.find(c => c.color === plan.color) || colorOptions[0]);
+                            setSelectedDuration(durationOptions.find(d => d.value === plan.duration_minutes) || durationOptions[4]);
+                            setSelectedEmoji(plan.emoji || '🧘‍♀️');
+                            setSelectedRepeat(repeatOptions.find(r => r.value === plan.repeat_type) || repeatOptions[4]);
+                            setStartTimeText(plan.start_time ? plan.start_time.split(' ')[0] : '6:00');
+                            setStartPeriod(plan.start_time && plan.start_time.includes('PM') ? 'PM' : 'AM');
+                            setEndTimeText(plan.end_time ? plan.end_time.split(' ')[0] : '8:00');
+                            setEndPeriod(plan.end_time && plan.end_time.includes('PM') ? 'PM' : 'AM');
+                            setIsAnytime(plan.is_anytime || false);
+                            setSelectedDate(new Date(plan.scheduled_date));
+                            setReminders({
+                                atStart: plan.reminder_at_start || false,
+                                atEnd: plan.reminder_at_end || false,
+                                beforeStart: plan.reminder_before_minutes > 0 || false
+                            });
+                            setChecklist(plan.checklist || []);
+                            setNotes(plan.notes || '');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error loading existing plan:', error);
+                }
+            }
+        };
+        loadExistingPlan();
+    }, [isEditMode, planId, user?.id]);
 
     const getCurrentDate = () => {
         return selectedDate.toLocaleDateString('en-US', {
@@ -116,6 +158,12 @@ export default function PlanDetails() {
     const handleSave = async () => {
         if (!user) return;
 
+        // Prevent editing completed plans
+        if (isEditMode && existingPlan?.is_completed) {
+            showToast('Cannot edit completed plans', 'error');
+            return;
+        }
+
         setIsLoading(true);
         try {
             const planData = {
@@ -135,15 +183,28 @@ export default function PlanDetails() {
                 notes: notes
             };
 
-            const response = await apiService.createPlan(planData);
-            if (response.success) {
-                showToast('Plan created successfully!', 'success');
-                router.push('/(tabs)');
+            let response;
+            if (isEditMode && planId) {
+                response = await apiService.updatePlan(Array.isArray(planId) ? planId[0] : planId, planData);
+                if (response.success) {
+                    showToast('Plan updated successfully!', 'success');
+                } else {
+                    showToast(response.error || 'Failed to update plan', 'error');
+                }
             } else {
-                showToast(response.error || 'Failed to create plan', 'error');
+                response = await apiService.createPlan(planData);
+                if (response.success) {
+                    showToast('Plan created successfully!', 'success');
+                } else {
+                    showToast(response.error || 'Failed to create plan', 'error');
+                }
+            }
+
+            if (response.success) {
+                router.push('/(tabs)');
             }
         } catch (error) {
-            showToast('Failed to create plan', 'error');
+            showToast(isEditMode ? 'Failed to update plan' : 'Failed to create plan', 'error');
         } finally {
             setIsLoading(false);
         }
@@ -179,6 +240,34 @@ export default function PlanDetails() {
             </View>
 
             <ScrollView style={{ flex: 1, paddingHorizontal: 20 }}>
+                {/* Completed Plan Warning */}
+                {isEditMode && isCompleted && (
+                    <View style={{
+                        backgroundColor: '#FEF3C7',
+                        borderRadius: 12,
+                        padding: 16,
+                        marginBottom: 20,
+                        borderLeftWidth: 4,
+                        borderLeftColor: '#F59E0B'
+                    }}>
+                        <Text style={{
+                            fontFamily: 'Poppins_600SemiBold',
+                            fontSize: 14,
+                            color: '#92400E',
+                            marginBottom: 4
+                        }}>
+                            ⚠️ This plan is completed
+                        </Text>
+                        <Text style={{
+                            fontFamily: 'Poppins_400Regular',
+                            fontSize: 12,
+                            color: '#92400E'
+                        }}>
+                            Completed plans cannot be edited, skipped, or deleted.
+                        </Text>
+                    </View>
+                )}
+
                 {/* Activity Name */}
                 <View style={{
                     backgroundColor: 'white',
@@ -189,10 +278,12 @@ export default function PlanDetails() {
                     shadowOffset: { width: 0, height: 2 },
                     shadowOpacity: 0.1,
                     shadowRadius: 4,
-                    elevation: 4
+                    elevation: 4,
+                    opacity: isCompleted ? 0.6 : 1
                 }}>
                     <TextInput
                         value={planName as string}
+                        editable={!isCompleted}
                         style={{
                             fontFamily: 'Poppins_600SemiBold',
                             fontSize: 18,
@@ -719,9 +810,9 @@ export default function PlanDetails() {
                 {/* Add Button */}
                 <Pressable
                     onPress={handleSave}
-                    disabled={isLoading}
+                    disabled={isLoading || isCompleted}
                     style={{
-                        backgroundColor: '#111827',
+                        backgroundColor: isCompleted ? '#9CA3AF' : '#111827',
                         borderRadius: 16,
                         paddingVertical: 16,
                         alignItems: 'center',
@@ -739,7 +830,7 @@ export default function PlanDetails() {
                         fontSize: 16,
                         color: 'white'
                     }}>
-                        {isLoading ? 'Adding...' : 'Add'}
+                        {isCompleted ? 'Cannot Edit Completed Plan' : (isLoading ? (isEditMode ? 'Updating...' : 'Adding...') : (isEditMode ? 'Update' : 'Add'))}
                     </Text>
                 </Pressable>
             </ScrollView>

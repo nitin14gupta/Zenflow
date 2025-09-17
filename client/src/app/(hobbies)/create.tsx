@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, ScrollView, TextInput, StatusBar } from 'react-native';
-import { colors } from '../../components/ui';
+// import { colors } from '../../components/ui';
 import { useRouter } from 'expo-router';
 
 const suggestions = [

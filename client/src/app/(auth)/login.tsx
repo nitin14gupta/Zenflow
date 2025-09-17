@@ -7,7 +7,7 @@ import { useAuth } from "../../context/AuthContext";
 
 export default function Login() {
     const router = useRouter();
-    const { show } = useToast();
+    const { showToast } = useToast();
     const { login, isLoading } = useAuth();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -19,18 +19,18 @@ export default function Login() {
 
     const onSubmit = async () => {
         if (!canSubmit) {
-            if (!emailValid) show("Please enter a valid email address", "error");
-            else if (!passwordValid) show("Password must be at least 6 characters", "error");
+            if (!emailValid) showToast("Please enter a valid email address", "error");
+            else if (!passwordValid) showToast("Password must be at least 6 characters", "error");
             return;
         }
 
         const result = await login(email, password);
 
         if (result.success) {
-            show("Welcome back! 🎉", "success");
+            showToast("Welcome back! 🎉", "success");
             router.replace("/(tabs)");
         } else {
-            show(result.error || "Invalid credentials", "error");
+            showToast(result.error || "Invalid credentials", "error");
         }
     };
 

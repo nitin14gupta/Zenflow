@@ -8,7 +8,7 @@ import { useAuth } from "../../context/AuthContext";
 
 export default function Register() {
     const router = useRouter();
-    const { show } = useToast();
+    const { showToast } = useToast();
     const { answers } = useOnboarding();
     const { register, isLoading } = useAuth();
     const [email, setEmail] = useState("");
@@ -24,19 +24,19 @@ export default function Register() {
 
     const onSubmit = async () => {
         if (!canSubmit) {
-            if (!emailValid) show("Please enter a valid email address", "error");
-            else if (!passwordValid) show("Password must be at least 6 characters", "error");
-            else if (!passwordsMatch) show("Passwords do not match", "error");
+            if (!emailValid) showToast("Please enter a valid email address", "error");
+            else if (!passwordValid) showToast("Password must be at least 6 characters", "error");
+            else if (!passwordsMatch) showToast("Passwords do not match", "error");
             return;
         }
 
         const result = await register(email, password, answers);
 
         if (result.success) {
-            show("Account created successfully! Welcome to ZenFlow! 🌟", "success");
+            showToast("Account created successfully! Welcome to ZenFlow! 🌟", "success");
             router.replace("/(tabs)");
         } else {
-            show(result.error || "Failed to create account", "error");
+            showToast(result.error || "Failed to create account", "error");
         }
     };
 

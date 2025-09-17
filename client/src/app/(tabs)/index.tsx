@@ -24,14 +24,80 @@ export default function Home() {
   const scrollRef = useRef<ScrollView>(null);
   const [didScrollToToday, setDidScrollToToday] = useState(false);
 
+  const parseISODate = (dateStr?: string) => {
+    if (!dateStr) return null;
+    const [y, m, d] = dateStr.split('-').map((v: string) => parseInt(v, 10));
+    if (!y || !m || !d) return null;
+    return new Date(y, m - 1, d);
+  };
+
+  const isSameDay = (a: Date, b: Date) => a.toDateString() === b.toDateString();
+
+  const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+  const diffInDays = (a: Date, b: Date) => {
+    const ms = startOfDay(a).getTime() - startOfDay(b).getTime();
+    return Math.floor(ms / (1000 * 60 * 60 * 24));
+  };
+
+  const isWeekday = (d: Date) => {
+    const day = d.getDay();
+    return day >= 1 && day <= 5;
+  };
+
+  const isWeekend = (d: Date) => {
+    const day = d.getDay();
+    return day === 0 || day === 6;
+  };
+
+  const occursOnDate = (plan: any, date: Date) => {
+    const start = parseISODate(plan.scheduled_date);
+    if (!start) return false;
+    const candidate = startOfDay(date);
+    const begins = startOfDay(start);
+
+    const type = (plan.repeat_type || 'once') as string;
+
+    if (type === 'once') {
+      return isSameDay(candidate, begins);
+    }
+
+    // Do not show occurrences before the start date
+    if (candidate < begins) return false;
+
+    const days = diffInDays(candidate, begins);
+
+    switch (type) {
+      case 'daily':
+        return days >= 0;
+      case 'weekly':
+        return days % 7 === 0;
+      case 'biweekly':
+        return days % 14 === 0;
+      case 'monthly': {
+        // Match same day-of-month; if start was 31 and month shorter, show on last day of month
+        const targetDom = begins.getDate();
+        const lastDayOfMonth = new Date(candidate.getFullYear(), candidate.getMonth() + 1, 0).getDate();
+        const expectedDom = Math.min(targetDom, lastDayOfMonth);
+        return candidate.getDate() === expectedDom;
+      }
+      case 'weekdays':
+        return isWeekday(candidate);
+      case 'weekends':
+        return isWeekend(candidate);
+      default:
+        return false;
+    }
+  };
+
   const loadPlans = useCallback(async () => {
     if (!user?.id) return;
     const res = await apiService.getUserPlans(user.id);
     if (res.success) {
       const plans = res.data.plans || res.data || [];
-      const selectedDateStr = selectedDate.toISOString().split('T')[0];
-      const todays = plans.filter((p: any) => p.scheduled_date === selectedDateStr && !p.is_anytime);
-      const anytimes = plans.filter((p: any) => p.scheduled_date === selectedDateStr && p.is_anytime);
+      const todaysAll = plans.filter((p: any) => occursOnDate(p, selectedDate));
+      const todays = todaysAll.filter((p: any) => !p.is_anytime);
+      const anytimes = todaysAll.filter((p: any) => p.is_anytime);
       setDailyPlans(todays);
       setAnytimePlans(anytimes);
     }

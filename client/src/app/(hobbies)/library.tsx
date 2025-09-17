@@ -114,10 +114,15 @@ export default function HabitLibrary() {
     const handleClosePack = () => setSelectedPack(null);
 
     const handleAddAllHabits = async () => {
-        if (!user || !selectedPack) return;
+        if (!user) return;
+        // Gate: only premium users can add all from library
+        if (!(user as any).is_premium) {
+            router.push('/(settings)/subscription');
+            return;
+        }
+        if (!selectedPack) return;
         try {
             setIsAddingAll(true);
-            // Create each plan with reasonable defaults (repeat daily, anytime)
             for (const habit of selectedPack.habits) {
                 await apiService.createPlan({
                     name: habit.title,
@@ -251,7 +256,7 @@ export default function HabitLibrary() {
                                 onPress={handleAddAllHabits}
                                 style={{ backgroundColor: 'white', borderRadius: 24, paddingVertical: 12, alignItems: 'center', marginBottom: 16 }}
                             >
-                                <Text style={{ fontFamily: 'Poppins_600SemiBold', fontSize: 16, color: '#111827' }}>{isAddingAll ? 'Adding...' : 'Add all habits'}</Text>
+                                <Text style={{ fontFamily: 'Poppins_600SemiBold', fontSize: 16, color: '#111827' }}>{isAddingAll ? 'Adding...' : ((user as any)?.is_premium ? 'Add all habits' : 'Unlock with Premium')}</Text>
                             </Pressable>
                             <Text style={{ color: 'white', fontFamily: 'Poppins_400Regular', fontSize: 12, marginBottom: 12, opacity: 0.9 }}>{selectedPack?.description}</Text>
                         </ImageBackground>

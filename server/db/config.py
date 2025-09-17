@@ -51,6 +51,20 @@ class DatabaseConfig:
                 );
                 """)
                 return
+            # Optional: check subscription columns exist
+            try:
+                self.supabase.table('users').select('is_premium, subscription_plan, subscription_expires_at').limit(1).execute()
+                print("✅ Subscription columns exist on users table")
+            except Exception:
+                print("ℹ️ Add subscription columns to users table in Supabase SQL Editor:")
+                print(
+                    """
+ALTER TABLE users
+ADD COLUMN IF NOT EXISTS is_premium BOOLEAN DEFAULT FALSE,
+ADD COLUMN IF NOT EXISTS subscription_plan VARCHAR(20),
+ADD COLUMN IF NOT EXISTS subscription_expires_at TIMESTAMP WITH TIME ZONE;
+                    """
+                )
             
             try:
                 # Try to query password_reset_tokens table

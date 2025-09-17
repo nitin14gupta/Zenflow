@@ -19,6 +19,13 @@ export const API_CONFIG = {
             ONBOARDING_DATA: '/api/user/onboarding',
         },
 
+        // Payments
+        PAYMENTS: {
+            CREATE_ORDER: '/api/payments/create-order',
+            VERIFY: '/api/payments/verify',
+            ACTIVATE_TEST: '/api/payments/activate-test',
+        },
+
         // Health check
         HEALTH: '/api/health',
     },

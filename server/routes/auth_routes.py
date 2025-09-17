@@ -109,7 +109,10 @@ def login():
                 'id': str(user['id']),
                 'email': user['email'],
                 'is_verified': user['is_verified'],
-                'onboarding_data': user.get('onboarding_data', {})
+                'onboarding_data': user.get('onboarding_data', {}),
+                'is_premium': user.get('is_premium', False),
+                'subscription_plan': user.get('subscription_plan'),
+                'subscription_expires_at': user.get('subscription_expires_at')
             }
         }), 200
         
@@ -240,7 +243,10 @@ def verify_token():
                 'id': str(user['id']),
                 'email': user['email'],
                 'is_verified': user['is_verified'],
-                'onboarding_data': user.get('onboarding_data', {})
+                'onboarding_data': user.get('onboarding_data', {}),
+                'is_premium': user.get('is_premium', False),
+                'subscription_plan': user.get('subscription_plan'),
+                'subscription_expires_at': user.get('subscription_expires_at')
             }
         }), 200
         

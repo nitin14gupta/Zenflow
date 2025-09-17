@@ -243,6 +243,28 @@ class ApiService {
         }
         return null;
     }
+
+    // Payments
+    async createPaymentOrder(plan: 'weekly' | 'yearly'): Promise<ApiResponse> {
+        return this.makeRequest(API_CONFIG.ENDPOINTS.PAYMENTS.CREATE_ORDER, {
+            method: 'POST',
+            body: JSON.stringify({ plan })
+        });
+    }
+
+    async verifyPaymentAndActivate(payload: any): Promise<ApiResponse> {
+        return this.makeRequest(API_CONFIG.ENDPOINTS.PAYMENTS.VERIFY, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+    }
+
+    async activateTestSubscription(plan: 'weekly' | 'yearly'): Promise<ApiResponse> {
+        return this.makeRequest(API_CONFIG.ENDPOINTS.PAYMENTS.ACTIVATE_TEST, {
+            method: 'POST',
+            body: JSON.stringify({ plan })
+        });
+    }
 }
 
 // Export singleton instance

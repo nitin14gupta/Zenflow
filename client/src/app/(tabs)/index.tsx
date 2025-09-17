@@ -156,7 +156,7 @@ export default function Home() {
       <StatusBar barStyle="dark-content" backgroundColor="#FFF9F0" />
       {/* Header */}
       <View style={{
-        paddingTop: 10,
+        paddingTop: 25,
         paddingHorizontal: 20,
         paddingBottom: 20,
         backgroundColor: '#FFF9F0'

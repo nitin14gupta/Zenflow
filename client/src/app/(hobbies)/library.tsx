@@ -1,59 +1,115 @@
-import React from 'react';
-import { View, Text, Pressable, ScrollView, StatusBar } from 'react-native';
-import { colors } from '../../components/ui';
+import React, { useMemo, useState } from 'react';
+import { View, Text, Pressable, ScrollView, StatusBar, ImageBackground, Modal } from 'react-native';
 import { useRouter } from 'expo-router';
+import { apiService } from '../../api/apiService';
+import { useAuth } from '../../context/AuthContext';
+import { useToast } from '../../context/ToastContext';
 
-const habitCategories = [
+// Packs shown as large image cards
+// Images reference app assets; replace with real artwork when available
+
+type HabitItem = { id: string; title: string; emoji?: string; duration?: string };
+type HabitPack = {
+    id: string;
+    title: string;
+    subtitle: string;
+    description: string;
+    image: any; // require() reference to local asset
+    habits: HabitItem[];
+};
+
+const habitPacks: HabitPack[] = [
     {
-        id: '1',
-        title: 'Health & Fitness',
+        id: 'pack-1',
+        title: 'My Perfect Morning',
+        subtitle: 'Start the day with joy',
+        description:
+            'A perfect morning routine is a great way to help you start your day with joy and balance.',
+        image: require('../../../assets/images/splash-icon.png'),
         habits: [
-            { id: '1', emoji: '🏃‍♀️', title: 'Morning Run', duration: '30m' },
-            { id: '2', emoji: '💪', title: 'Workout', duration: '1h' },
-            { id: '3', emoji: '🧘‍♀️', title: 'Meditation', duration: '15m' },
-            { id: '4', emoji: '🥗', title: 'Healthy Meal Prep', duration: '1h' }
-        ]
+            { id: 'h-1', title: 'Wake up early', emoji: '⏰' },
+            { id: 'h-2', title: 'Drink a glass of water', emoji: '🥛' },
+            { id: 'h-3', title: '15 minutes meditation', emoji: '🧘‍♀️' },
+            { id: 'h-4', title: 'Exercise', emoji: '🏋️' },
+            { id: 'h-5', title: 'Have a healthy breakfast', emoji: '🍳' },
+            { id: 'h-6', title: 'Read a book for 30 minutes', emoji: '📚' },
+            { id: 'h-7', title: 'Set goals for the day', emoji: '🎯' },
+        ],
     },
     {
-        id: '2',
-        title: 'Productivity',
+        id: 'pack-2',
+        title: 'Digital Detox',
+        subtitle: 'Unplug from devices',
+        description: 'Reduce screen time and reclaim your focus throughout the day.',
+        image: require('../../../assets/images/icon.png'),
         habits: [
-            { id: '5', emoji: '📚', title: 'Read 30 pages', duration: '45m' },
-            { id: '6', emoji: '📝', title: 'Journal Writing', duration: '20m' },
-            { id: '7', emoji: '🎯', title: 'Goal Planning', duration: '30m' },
-            { id: '8', emoji: '📧', title: 'Email Management', duration: '15m' }
-        ]
+            { id: 'h-8', title: 'No phone for first hour', emoji: '📵' },
+            { id: 'h-9', title: 'Disable non‑essential notifications', emoji: '🔕' },
+            { id: 'h-10', title: 'Schedule two focus blocks', emoji: '⏱️' },
+        ],
     },
     {
-        id: '3',
-        title: 'Home & Organization',
+        id: 'pack-3',
+        title: 'Clean Home, Clean Mind',
+        subtitle: 'Create a consistent routine',
+        description: 'Simple chores to keep your space tidy and your mind calm.',
+        image: require('../../../assets/images/android-icon-foreground.png'),
         habits: [
-            { id: '9', emoji: '🧹', title: 'Deep Clean Room', duration: '1h' },
-            { id: '10', emoji: '👗', title: 'Organize Wardrobe', duration: '30m' },
-            { id: '11', emoji: '🪟', title: 'Wash Windows', duration: '45m' },
-            { id: '12', emoji: '🛋️', title: 'Vacuum Sofa', duration: '20m' }
-        ]
+            { id: 'h-11', title: 'Tidy desk', emoji: '🧹' },
+            { id: 'h-12', title: 'Quick vacuum', emoji: '🧼' },
+            { id: 'h-13', title: 'Wipe counters', emoji: '🧽' },
+        ],
     },
-    {
-        id: '4',
-        title: 'Personal Growth',
-        habits: [
-            { id: '13', emoji: '💡', title: 'Mentor Someone', duration: '1h' },
-            { id: '14', emoji: '💖', title: 'Random Act of Kindness', duration: '15m' },
-            { id: '15', emoji: '❤️', title: 'Donate to Charity', duration: '10m' },
-            { id: '16', emoji: '🎨', title: 'Creative Project', duration: '2h' }
-        ]
-    }
 ];
 
 export default function HabitLibrary() {
     const router = useRouter();
+    const { user } = useAuth();
+    const { showToast } = useToast();
 
-    const handleHabitSelect = (habit: any) => {
-        router.push({
-            pathname: '/(hobbies)/details',
-            params: { planName: habit.title }
-        });
+    const [selectedPack, setSelectedPack] = useState<HabitPack | null>(null);
+    const [isAddingAll, setIsAddingAll] = useState(false);
+
+    const todayIso = useMemo(() => new Date().toISOString().split('T')[0], []);
+
+    const handleOpenPack = (pack: HabitPack) => setSelectedPack(pack);
+    const handleClosePack = () => setSelectedPack(null);
+
+    const handleAddAllHabits = async () => {
+        if (!user || !selectedPack) return;
+        try {
+            setIsAddingAll(true);
+            // Create each plan with reasonable defaults (repeat daily, anytime)
+            for (const habit of selectedPack.habits) {
+                await apiService.createPlan({
+                    name: habit.title,
+                    color: '#DEEDF4',
+                    emoji: habit.emoji || '🌟',
+                    duration_minutes: 60,
+                    start_time: null,
+                    end_time: null,
+                    scheduled_date: todayIso,
+                    is_anytime: true,
+                    repeat_type: 'daily',
+                    reminder_at_start: true,
+                    reminder_at_end: false,
+                    reminder_before_minutes: 0,
+                    checklist: [],
+                    notes: ''
+                });
+            }
+            showToast('All habits added!', 'success');
+            setSelectedPack(null);
+            router.push('/(tabs)');
+        } catch (e) {
+            showToast('Failed to add habits', 'error');
+        } finally {
+            setIsAddingAll(false);
+        }
+    };
+
+    const handleHabitSelect = (habit: HabitItem) => {
+        router.push({ pathname: '/(hobbies)/details', params: { planName: habit.title } });
     };
 
     return (
@@ -93,19 +149,79 @@ export default function HabitLibrary() {
             </View>
 
             <ScrollView style={{ flex: 1, paddingHorizontal: 20 }}>
-                {habitCategories.map((category) => (
-                    <View key={category.id} style={{ marginBottom: 32 }}>
-                        <Text style={{
-                            fontFamily: 'Poppins_700Bold',
-                            fontSize: 18,
-                            color: '#111827',
-                            marginBottom: 16
-                        }}>
-                            {category.title}
-                        </Text>
+                {/* Card grid */}
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+                    {habitPacks.map((pack) => (
+                        <Pressable
+                            key={pack.id}
+                            onPress={() => handleOpenPack(pack)}
+                            style={{ width: '48%', borderRadius: 16, overflow: 'hidden', backgroundColor: 'white', marginBottom: 16 }}
+                        >
+                            <ImageBackground
+                                source={pack.image}
+                                resizeMode="cover"
+                                style={{ height: 200, justifyContent: 'flex-end' }}
+                            >
+                                <View style={{ padding: 12 }}>
+                                    <Text style={{ color: 'white', fontFamily: 'Poppins_700Bold', fontSize: 18 }}>{pack.title}</Text>
+                                    <Text style={{ color: 'white', fontFamily: 'Poppins_400Regular', fontSize: 12 }}>{pack.subtitle}</Text>
+                                </View>
+                            </ImageBackground>
+                        </Pressable>
+                    ))}
+                </View>
 
-                        <View style={{ gap: 12 }}>
-                            {category.habits.map((habit) => (
+                {/* Footer CTA */}
+                <Pressable
+                    onPress={() => router.push('/(hobbies)/create')}
+                    style={{
+                        backgroundColor: 'white',
+                        borderRadius: 16,
+                        paddingVertical: 18,
+                        paddingHorizontal: 16,
+                        alignItems: 'center',
+                        marginTop: 12,
+                        marginBottom: 28,
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: 1 },
+                        shadowOpacity: 0.05,
+                        shadowRadius: 2,
+                        elevation: 2
+                    }}
+                >
+                    <Text style={{ fontFamily: 'Poppins_600SemiBold', fontSize: 16, color: '#111827' }}>Browse all habits →</Text>
+                </Pressable>
+            </ScrollView>
+
+            {/* Pack Overlay */}
+            <Modal visible={!!selectedPack} transparent animationType="slide">
+                <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                    <View style={{ flex: 1, backgroundColor: '#fff' }}>
+                        {/* Top hero */}
+                        <ImageBackground
+                            source={selectedPack?.image}
+                            resizeMode="cover"
+                            style={{ height: 320, paddingTop: 40, paddingHorizontal: 20, justifyContent: 'flex-end' }}
+                        >
+                            <Pressable onPress={handleClosePack} style={{ position: 'absolute', top: 40, left: 20, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.9)', alignItems: 'center', justifyContent: 'center' }}>
+                                <Text style={{ fontSize: 18, color: '#374151' }}>✕</Text>
+                            </Pressable>
+                            <Text style={{ color: 'white', fontFamily: 'Poppins_700Bold', fontSize: 32 }}>{selectedPack?.title}</Text>
+                            <Text style={{ color: 'white', fontFamily: 'Poppins_400Regular', fontSize: 16, marginBottom: 12 }}>{selectedPack?.subtitle}</Text>
+                            <Pressable
+                                disabled={isAddingAll}
+                                onPress={handleAddAllHabits}
+                                style={{ backgroundColor: 'white', borderRadius: 24, paddingVertical: 12, alignItems: 'center', marginBottom: 16 }}
+                            >
+                                <Text style={{ fontFamily: 'Poppins_600SemiBold', fontSize: 16, color: '#111827' }}>{isAddingAll ? 'Adding...' : 'Add all habits'}</Text>
+                            </Pressable>
+                            <Text style={{ color: 'white', fontFamily: 'Poppins_400Regular', fontSize: 12, marginBottom: 12, opacity: 0.9 }}>{selectedPack?.description}</Text>
+                        </ImageBackground>
+
+                        {/* Habits list */}
+                        <ScrollView style={{ flex: 1, paddingHorizontal: 20, paddingTop: 16 }}>
+                            <Text style={{ fontFamily: 'Poppins_700Bold', fontSize: 18, color: '#111827', marginBottom: 12 }}>Daily</Text>
+                            {selectedPack?.habits.map((habit) => (
                                 <Pressable
                                     key={habit.id}
                                     onPress={() => handleHabitSelect(habit)}
@@ -113,49 +229,32 @@ export default function HabitLibrary() {
                                         flexDirection: 'row',
                                         alignItems: 'center',
                                         backgroundColor: 'white',
-                                        borderRadius: 12,
-                                        padding: 16,
+                                        borderRadius: 24,
+                                        paddingVertical: 16,
+                                        paddingHorizontal: 16,
+                                        marginBottom: 12,
                                         shadowColor: '#000',
                                         shadowOffset: { width: 0, height: 1 },
                                         shadowOpacity: 0.05,
                                         shadowRadius: 2,
-                                        elevation: 2
+                                        elevation: 1
                                     }}
                                 >
-                                    <Text style={{ fontSize: 24, marginRight: 16 }}>{habit.emoji}</Text>
+                                    <Text style={{ fontSize: 22, marginRight: 12 }}>{habit.emoji || '🌟'}</Text>
                                     <View style={{ flex: 1 }}>
-                                        <Text style={{
-                                            fontFamily: 'Poppins_600SemiBold',
-                                            fontSize: 16,
-                                            color: '#111827',
-                                            marginBottom: 4
-                                        }}>
-                                            {habit.title}
-                                        </Text>
-                                        <Text style={{
-                                            fontFamily: 'Poppins_400Regular',
-                                            fontSize: 14,
-                                            color: '#6B7280'
-                                        }}>
-                                            {habit.duration}
-                                        </Text>
+                                        <Text style={{ fontFamily: 'Poppins_600SemiBold', fontSize: 16, color: '#111827' }}>{habit.title}</Text>
+                                        <Text style={{ fontFamily: 'Poppins_400Regular', fontSize: 12, color: '#6B7280' }}>Repeats Daily</Text>
                                     </View>
-                                    <Pressable style={{
-                                        width: 32,
-                                        height: 32,
-                                        borderRadius: 16,
-                                        backgroundColor: '#F3F4F6',
-                                        alignItems: 'center',
-                                        justifyContent: 'center'
-                                    }}>
-                                        <Text style={{ fontSize: 16, color: '#6B7280' }}>+</Text>
-                                    </Pressable>
+                                    <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: '#F3F4F6', alignItems: 'center', justifyContent: 'center' }}>
+                                        <Text style={{ fontSize: 18, color: '#6B7280' }}>+</Text>
+                                    </View>
                                 </Pressable>
                             ))}
-                        </View>
+                            <View style={{ height: 32 }} />
+                        </ScrollView>
                     </View>
-                ))}
-            </ScrollView>
+                </View>
+            </Modal>
         </View>
     );
 }

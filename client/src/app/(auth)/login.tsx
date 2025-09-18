@@ -6,6 +6,7 @@ import { useToast } from "../../context/ToastContext";
 import { useAuth } from "../../context/AuthContext";
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
+import { makeRedirectUri } from "expo-auth-session";
 
 // android : 746039886902-5vlmhjn76mgoopgfru5l7q51t6c0j7ep.apps.googleusercontent.com
 // ios : 746039886902-nh57ar0unrl0a1bnc7ktj363855oljh9.apps.googleusercontent.com
@@ -20,12 +21,14 @@ export default function Login() {
     const [password, setPassword] = useState("");
     const [showPass, setShowPass] = useState(false);
 
+    const redirectUri = makeRedirectUri({ useProxy: false });
     const [request, response, promptAsync] = Google.useAuthRequest({
         iosClientId: "746039886902-nh57ar0unrl0a1bnc7ktj363855oljh9.apps.googleusercontent.com",
         androidClientId: "746039886902-5vlmhjn76mgoopgfru5l7q51t6c0j7ep.apps.googleusercontent.com",
         webClientId: "746039886902-86q24v8m81r1fg2hp2l3j386b2iplad7.apps.googleusercontent.com",
-        // expoClientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID,
         scopes: ["profile", "email"],
+        responseType: "id_token",
+        redirectUri,
     });
 
     const emailValid = useMemo(() => /.+@.+\..+/.test(email), [email]);
@@ -51,8 +54,9 @@ export default function Login() {
 
     useEffect(() => {
         const handleGoogle = async () => {
-            if (response?.type === 'success' && response.authentication?.idToken) {
-                const result = await loginWithGoogle(response.authentication.idToken);
+            const idToken = (response as any)?.authentication?.idToken || (response as any)?.params?.id_token;
+            if (response?.type === 'success' && idToken) {
+                const result = await loginWithGoogle(idToken);
                 if (result.success) {
                     showToast("Welcome back! 🎉", "success");
                     router.replace("/(tabs)");
@@ -69,7 +73,7 @@ export default function Login() {
 
     const onGooglePress = async () => {
         try {
-            await promptAsync();
+            await promptAsync({ useProxy: false, redirectUri });
         } catch (e) {
             showToast("Unable to start Google sign-in", "error");
         }

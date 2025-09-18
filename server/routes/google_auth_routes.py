@@ -25,6 +25,7 @@ def _validate_google_id_token(id_token: str):
         allowed_auds = set(filter(None, [
             os.getenv('GOOGLE_CLIENT_ID_ANDROID'),
             os.getenv('GOOGLE_CLIENT_ID_IOS'),
+            os.getenv('GOOGLE_CLIENT_ID_WEB'),
         ]))
 
         if allowed_auds and aud not in allowed_auds:

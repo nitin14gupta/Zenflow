@@ -15,7 +15,7 @@ def create_app():
     app = Flask(__name__)
     
     # Enable CORS for all routes
-    CORS(app, origins=['http://localhost:3000', 'http://localhost:8081', 'exp://192.168.*.*:8081'])
+    CORS(app, origins=['http://localhost:3000', 'http://localhost:8081', 'http://localhost:19006', 'http://192.168.0.105:19006', 'exp://192.168.*.*:8081'])
     
     # Register blueprints
     app.register_blueprint(auth_bp)

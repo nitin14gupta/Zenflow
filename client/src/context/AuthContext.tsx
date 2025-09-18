@@ -9,6 +9,7 @@ type AuthContextValue = {
     isLoading: boolean;
     login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
     register: (email: string, password: string, onboardingData?: any) => Promise<{ success: boolean; error?: string }>;
+    loginWithGoogle: (idToken: string) => Promise<{ success: boolean; error?: string }>;
     logout: () => Promise<void>;
     refreshUser: () => Promise<void>;
     updateOnboardingData: (data: any) => Promise<{ success: boolean; error?: string }>;
@@ -54,6 +55,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
         } catch (error) {
             return { success: false, error: "Network error. Please check your connection." };
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    const loginWithGoogle = useCallback(async (idToken: string) => {
+        try {
+            setIsLoading(true);
+            const response = await apiService.loginWithGoogle(idToken);
+            if (response.success && response.data) {
+                setUser(response.data.user);
+                return { success: true };
+            }
+            return { success: false, error: response.error || 'Google sign-in failed' };
+        } catch (error) {
+            return { success: false, error: 'Network error. Please check your connection.' };
         } finally {
             setIsLoading(false);
         }
@@ -119,10 +136,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoading,
         login,
         register,
+        loginWithGoogle,
         logout,
         refreshUser,
         updateOnboardingData,
-    }), [user, isAuthenticated, isLoading, login, register, logout, refreshUser, updateOnboardingData]);
+    }), [user, isAuthenticated, isLoading, login, register, loginWithGoogle, logout, refreshUser, updateOnboardingData]);
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

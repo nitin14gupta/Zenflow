@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "client",
-    "slug": "client",
+    "name": "zenflow",
+    "slug": "zenflow",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "client",
+    "scheme": "zenflow",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -49,8 +49,7 @@
     "extra": {
       "router": {},
       "env": {
-        "EXPO_PUBLIC_API_BASE_URL": "http://192.168.0.106:5000",
-        "EXPO_PUBLIC_GOOGLE_CLIENT_ID": "603590035660-i7o6gf96lm0cqnntgllpnt8v0ra5n7g1.apps.googleusercontent.com"
+        "EXPO_PUBLIC_API_BASE_URL": "http://192.168.0.105:5000"
       },
       "eas": {
         "projectId": "90a72d72-ec75-4d89-a3b5-1fc68065c77d"

@@ -126,6 +126,20 @@ class ApiService {
         return response;
     }
 
+    async loginWithGoogle(idToken: string): Promise<ApiResponse<AuthResponse>> {
+        const response = await this.makeRequest<AuthResponse>(API_CONFIG.ENDPOINTS.AUTH.GOOGLE, {
+            method: 'POST',
+            body: JSON.stringify({ id_token: idToken }),
+        });
+
+        if (response.success && response.data?.token) {
+            await this.setAuthToken(response.data.token);
+            await AsyncStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(response.data.user));
+        }
+
+        return response;
+    }
+
     async forgotPassword(email: string): Promise<ApiResponse> {
         return this.makeRequest(API_CONFIG.ENDPOINTS.AUTH.FORGOT_PASSWORD, {
             method: 'POST',

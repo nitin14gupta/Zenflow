@@ -9,3 +9,4 @@ smtplib
 email-validator
 python-multipart
 razorpay
+requests

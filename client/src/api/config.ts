@@ -1,6 +1,6 @@
 // API Configuration
 export const API_CONFIG = {
-    BASE_URL: 'http://192.168.0.103:5000',
+    BASE_URL: 'http://192.168.0.105:5000',
 
     ENDPOINTS: {
         // Auth endpoints
@@ -9,7 +9,7 @@ export const API_CONFIG = {
             LOGIN: '/api/auth/login',
             FORGOT_PASSWORD: '/api/auth/forgot-password',
             RESET_PASSWORD: '/api/auth/reset-password',
-            VERIFY_TOKEN: '/api/auth/verify-token',
+            VERIFY_TOKEN: '/api/auth/verify-token'
         },
 
         // User endpoints

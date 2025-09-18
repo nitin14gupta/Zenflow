@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View, Text, Pressable, ScrollView, Dimensions, RefreshControl } from 'react-native';
+import { View, Text, Pressable, ScrollView, Dimensions, RefreshControl, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { colors } from '../../components/ui';
+import { colors, formatTimeTo12h } from '../../components/ui';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { StatusBar } from 'react-native';
@@ -23,6 +23,7 @@ export default function Home() {
   const [showAnytime, setShowAnytime] = useState(true);
   const scrollRef = useRef<ScrollView>(null);
   const [didScrollToToday, setDidScrollToToday] = useState(false);
+  const fabAnim = useRef(new Animated.Value(0)).current;
 
   const parseISODate = (dateStr?: string) => {
     if (!dateStr) return null;
@@ -106,6 +107,15 @@ export default function Home() {
   useEffect(() => {
     loadPlans();
   }, [loadPlans]);
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(fabAnim, { toValue: -6, duration: 900, useNativeDriver: true }),
+        Animated.timing(fabAnim, { toValue: 0, duration: 900, useNativeDriver: true })
+      ])
+    ).start();
+  }, [fabAnim]);
 
   useFocusEffect(
     useCallback(() => {
@@ -363,14 +373,14 @@ export default function Home() {
               {dailyPlans.map((plan) => (
                 <View key={plan.id} style={{
                   backgroundColor: plan.color || '#FFF9F0',
-                  borderRadius: 12,
+                  borderRadius: 50,
                   padding: 16,
                   flexDirection: 'row',
                   alignItems: 'center',
                   borderWidth: 1,
                   borderColor: '#E5E7EB'
                 }}>
-                  <View style={{ marginRight: 16 }}>
+                  {/* <View style={{ marginRight: 16 }}>
                     <Text style={{
                       fontFamily: 'Poppins_600SemiBold',
                       fontSize: 12,
@@ -392,7 +402,7 @@ export default function Home() {
                     }}>
                       {plan.end_time || '--'}
                     </Text>
-                  </View>
+                  </View> */}
 
                   <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
                     <Pressable onPress={() => { setModalPlan(plan); setShowPlanModal(true); }} style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
@@ -414,7 +424,7 @@ export default function Home() {
                           fontSize: 12,
                           color: plan.is_skipped ? '#9CA3AF' : '#6B7280'
                         }}>
-                          {plan.start_time || '--'}-{plan.end_time || '--'} ({plan.duration_minutes}m)
+                          {formatTimeTo12h(plan.start_time)}-{formatTimeTo12h(plan.end_time)} ({plan.duration_minutes}m)
                         </Text>
                       </View>
                     </Pressable>
@@ -493,7 +503,7 @@ export default function Home() {
               {anytimePlans.map((plan) => (
                 <View key={plan.id} style={{
                   backgroundColor: plan.color || '#F9FAFB',
-                  borderRadius: 12,
+                  borderRadius: 50,
                   padding: 16,
                   flexDirection: 'row',
                   alignItems: 'center',
@@ -562,27 +572,26 @@ export default function Home() {
       </ScrollView>
 
       {/* Floating Action Button */}
-      <Pressable
-        onPress={handleCreatePlan}
-        style={{
-          position: 'absolute',
-          bottom: 30,
-          alignSelf: 'center',
-          width: 64,
-          height: 64,
-          borderRadius: 32,
-          backgroundColor: '#374151',
-          alignItems: 'center',
-          justifyContent: 'center',
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.3,
-          shadowRadius: 8,
-          elevation: 8
-        }}
-      >
-        <Text style={{ fontSize: 40, color: 'white', fontWeight: '300' }}>+</Text>
-      </Pressable>
+      <Animated.View style={{ position: 'absolute', bottom: 30, alignSelf: 'center', transform: [{ translateY: fabAnim }] }}>
+        <Pressable
+          onPress={handleCreatePlan}
+          style={{
+            width: 64,
+            height: 64,
+            borderRadius: 32,
+            backgroundColor: '#374151',
+            alignItems: 'center',
+            justifyContent: 'center',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 8
+          }}
+        >
+          <Text style={{ fontSize: 40, color: 'white', fontWeight: '300' }}>+</Text>
+        </Pressable>
+      </Animated.View>
 
       {/* Create Plan Modal */}
       {showCreateModal && (
@@ -749,7 +758,7 @@ export default function Home() {
               </View>
             </View>
             <Text style={{ fontFamily: 'Poppins_400Regular', fontSize: 12, color: '#6B7280', marginBottom: 16 }}>
-              {modalPlan.start_time || '--'}-{modalPlan.end_time || '--'} ({modalPlan.duration_minutes} min)
+              {formatTimeTo12h(modalPlan.start_time)}-{formatTimeTo12h(modalPlan.end_time)} ({modalPlan.duration_minutes} min)
             </Text>
 
             {/* Repeat and Reminder Info */}

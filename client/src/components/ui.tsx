@@ -90,3 +90,17 @@ export const ProgressBar: React.FC<{ progress: number }> = ({ progress }) => {
 };
 
 
+export const formatTimeTo12h = (time?: string): string => {
+    if (!time) return "--";
+    // Accept formats like HH:MM or HH:MM:SS
+    const parts = time.split(":");
+    if (parts.length < 2) return time;
+    let hour = parseInt(parts[0], 10);
+    const minute = parts[1] ?? "00";
+    if (isNaN(hour)) return time;
+    const ampm = hour >= 12 ? "PM" : "AM";
+    hour = hour % 12;
+    if (hour === 0) hour = 12;
+    return `${hour}:${minute.padStart(2, "0")} ${ampm}`;
+};
+

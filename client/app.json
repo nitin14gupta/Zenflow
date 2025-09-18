@@ -9,7 +9,8 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.zenflow.app"
     },
     "android": {
       "adaptiveIcon": {
@@ -19,7 +20,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.zenflow.app"
     },
     "web": {
       "output": "static",
@@ -43,6 +45,16 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "env": {
+        "EXPO_PUBLIC_API_BASE_URL": "http://192.168.0.106:5000",
+        "EXPO_PUBLIC_GOOGLE_CLIENT_ID": "603590035660-i7o6gf96lm0cqnntgllpnt8v0ra5n7g1.apps.googleusercontent.com"
+      },
+      "eas": {
+        "projectId": "90a72d72-ec75-4d89-a3b5-1fc68065c77d"
+      }
     }
   }
 }

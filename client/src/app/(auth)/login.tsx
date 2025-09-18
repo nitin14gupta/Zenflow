@@ -5,6 +5,8 @@ import { useRouter } from "expo-router";
 import { useToast } from "../../context/ToastContext";
 import { useAuth } from "../../context/AuthContext";
 
+// android : 
+// ios : 
 export default function Login() {
     const router = useRouter();
     const { showToast } = useToast();
@@ -144,5 +146,3 @@ export default function Login() {
         </ScrollView>
     );
 }
-
-

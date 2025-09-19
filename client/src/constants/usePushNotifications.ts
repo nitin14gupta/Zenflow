@@ -18,8 +18,9 @@ export const usePushNotifications = (): PushNotificationState => {
     Notifications.setNotificationHandler({
         handleNotification: async () => ({
             shouldPlaySound: true,
-            shouldShowAlert: true,
-            shouldSetBadge: false,
+            shouldSetBadge: true,
+            shouldShowBanner: true,
+            shouldShowList: true,
         }),
     });
 
@@ -90,11 +91,8 @@ export const usePushNotifications = (): PushNotificationState => {
             });
 
         return () => {
-            Notifications.removeNotificationSubscription(
-                notificationListener.current!
-            );
-
-            Notifications.removeNotificationSubscription(responseListener.current!);
+            try { notificationListener.current?.remove && notificationListener.current.remove(); } catch { }
+            try { responseListener.current?.remove && responseListener.current.remove(); } catch { }
         };
     }, []);
 

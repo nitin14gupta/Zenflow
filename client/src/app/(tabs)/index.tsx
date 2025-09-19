@@ -9,6 +9,7 @@ import ConfettiCannon from 'react-native-confetti-cannon';
 import { apiService } from '../../api/apiService';
 import { MaterialIcons } from '@expo/vector-icons';
 import { usePushNotifications } from '../../constants/usePushNotifications';
+import { preloadBundledAssetsIfNeeded } from '../../constants/preloadAssets';
 
 const { width } = Dimensions.get('window');
 
@@ -27,9 +28,15 @@ export default function Home() {
   const [didScrollToToday, setDidScrollToToday] = useState(false);
   const fabAnim = useRef(new Animated.Value(0)).current;
   const didSendTestPushRef = useRef(false);
+  const didPreloadRef = useRef(false);
 
   // Fire a one-time test push on first load if token is available
   useEffect(() => {
+    // Preload bundled assets once at startup for snappy UX
+    if (!didPreloadRef.current) {
+      didPreloadRef.current = true;
+      preloadBundledAssetsIfNeeded();
+    }
     try {
       const token = (expoPushToken as any)?.data as string | undefined;
       if (!didSendTestPushRef.current && token) {

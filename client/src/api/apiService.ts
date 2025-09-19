@@ -217,6 +217,21 @@ class ApiService {
         return this.makeRequest(API_CONFIG.ENDPOINTS.HEALTH);
     }
 
+    // Push notifications
+    async registerPushToken(expoPushToken: string, userId?: string): Promise<ApiResponse> {
+        return this.makeRequest(API_CONFIG.ENDPOINTS.PUSH.REGISTER, {
+            method: 'POST',
+            body: JSON.stringify({ expo_push_token: expoPushToken, user_id: userId }),
+        });
+    }
+
+    async sendTestPush(expoPushToken?: string, userId?: string, title?: string, body?: string, data?: any): Promise<ApiResponse> {
+        return this.makeRequest(API_CONFIG.ENDPOINTS.PUSH.SEND_TEST, {
+            method: 'POST',
+            body: JSON.stringify({ expo_push_token: expoPushToken, user_id: userId, title, body, data }),
+        });
+    }
+
     // Daily Plans API
     async createPlan(planData: any): Promise<ApiResponse> {
         return this.makeRequest('/api/plans/create', {

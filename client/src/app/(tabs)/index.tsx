@@ -8,11 +8,13 @@ import { StatusBar } from 'react-native';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import { apiService } from '../../api/apiService';
 import { MaterialIcons } from '@expo/vector-icons';
+import { usePushNotifications } from '../../constants/usePushNotifications';
 
 const { width } = Dimensions.get('window');
 
 export default function Home() {
   const { user } = useAuth();
+  const { expoPushToken } = usePushNotifications();
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [dailyPlans, setDailyPlans] = useState<any[]>([]);
@@ -24,6 +26,19 @@ export default function Home() {
   const scrollRef = useRef<ScrollView>(null);
   const [didScrollToToday, setDidScrollToToday] = useState(false);
   const fabAnim = useRef(new Animated.Value(0)).current;
+  const didSendTestPushRef = useRef(false);
+
+  // Fire a one-time test push on first load if token is available
+  useEffect(() => {
+    try {
+      const token = (expoPushToken as any)?.data as string | undefined;
+      if (!didSendTestPushRef.current && token) {
+        didSendTestPushRef.current = true;
+        console.log('Triggering test push to token:', token);
+        apiService.sendTestPush(token, undefined, 'ZenFlow Test', 'Push is working ✅');
+      }
+    } catch { }
+  }, [expoPushToken]);
 
   const parseISODate = (dateStr?: string) => {
     if (!dateStr) return null;

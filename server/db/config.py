@@ -119,6 +119,44 @@ ADD COLUMN IF NOT EXISTS subscription_expires_at TIMESTAMP WITH TIME ZONE;
                 );
                 """)
                 return
+            
+            # Push tokens table
+            try:
+                self.supabase.table('push_tokens').select('id').limit(1).execute()
+                print("✅ Push tokens table already exists")
+            except Exception:
+                print("❌ Push tokens table doesn't exist - please create it manually in Supabase dashboard")
+                print(
+                    """
+CREATE TABLE push_tokens (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    expo_push_token VARCHAR(255) UNIQUE NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+                    """
+                )
+                return
+
+            # Optional: push event logs table (to help debug and avoid spam)
+            try:
+                self.supabase.table('push_events').select('id').limit(1).execute()
+                print("✅ Push events table already exists")
+            except Exception:
+                print("ℹ️ (Optional) Create push_events table for logging:")
+                print(
+                    """
+CREATE TABLE push_events (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    expo_push_token VARCHAR(255),
+    title TEXT,
+    body TEXT,
+    payload JSONB,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+                    """
+                )
                 
             print("✅ All database tables are ready")
             

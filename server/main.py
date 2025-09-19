@@ -8,6 +8,12 @@ from routes.auth_routes import auth_bp
 from routes.google_auth_routes import auth_google_bp
 from routes.apple_auth_routes import auth_apple_bp
 from routes.plan_routes import plan_bp
+from routes.push_routes import push_bp
+from utils.push_service import push_service
+from apscheduler.schedulers.background import BackgroundScheduler
+from datetime import datetime, timedelta
+import random
+from db.config import db_config
 
 # Load environment variables
 load_dotenv()
@@ -23,6 +29,7 @@ def create_app():
     app.register_blueprint(auth_google_bp)
     app.register_blueprint(auth_apple_bp)
     app.register_blueprint(plan_bp)
+    app.register_blueprint(push_bp)
     
     # Health check endpoint
     @app.route('/api/health', methods=['GET'])
@@ -69,6 +76,133 @@ if __name__ == '__main__':
     
     # Create and run app
     app = create_app()
+
+    # Scheduler for periodic notifications
+    scheduler = BackgroundScheduler()
+
+    def send_daily_nudges():
+        try:
+            supabase = db_config.get_client()
+            res = supabase.table('push_tokens').select('expo_push_token').execute()
+            tokens = [row['expo_push_token'] for row in (res.data or [])]
+            if not tokens:
+                return
+            # Pick up to 5 random tokens to avoid spamming
+            sample_size = min(5, len(tokens))
+            target_tokens = random.sample(tokens, sample_size)
+
+            titles = [
+                'Keep your streak alive 🔥',
+                'Quick win time ✨',
+                '2 minutes for future you ⏳',
+                'ZenFlow check-in 🧘',
+                'Tiny step, big impact 🚀',
+            ]
+            bodies = [
+                'Open ZenFlow and plan your next move.',
+                'A 2-minute action beats perfect plans.',
+                'What’s one small task you can do now?',
+                'Momentum loves consistency.',
+                'Show up for yourself today.',
+            ]
+
+            messages = []
+            for t in target_tokens:
+                messages.append(
+                    push_service.build_message(
+                        t,
+                        random.choice(titles),
+                        random.choice(bodies),
+                        {'type': 'nudge'}
+                    )
+                )
+
+            push_service.send_messages(messages)
+        except Exception as e:
+            print(f"Nudge scheduler error: {e}")
+
+    # Run 4-5 nudges throughout the day (e.g., every ~3 hours during 9-21)
+    scheduler.add_job(send_daily_nudges, 'cron', hour='9,12,15,18,21', minute=0)
+
+    # Plan-based reminders
+    def send_plan_reminders():
+        try:
+            supabase = db_config.get_client()
+            now = datetime.utcnow()
+            today_str = now.date().isoformat()
+
+            # Fetch plans scheduled for today and not completed
+            res = supabase.table('daily_plans').select('*').eq('scheduled_date', today_str).eq('is_completed', False).execute()
+            plans = res.data or []
+
+            # Map user -> tokens
+            tokens_res = supabase.table('push_tokens').select('user_id, expo_push_token').execute()
+            user_to_tokens = {}
+            for row in (tokens_res.data or []):
+                user_to_tokens.setdefault(row.get('user_id'), []).append(row['expo_push_token'])
+
+            messages = []
+            for plan in plans:
+                user_id = plan.get('user_id')
+                tokens = user_to_tokens.get(user_id, [])
+                if not tokens:
+                    continue
+
+                # Parse stored time strings like "6:00 PM"
+                def parse_time(tstr):
+                    if not tstr:
+                        return None
+                    try:
+                        return datetime.strptime(f"{today_str} {tstr}", "%Y-%m-%d %I:%M %p")
+                    except Exception:
+                        return None
+
+                start_dt = parse_time(plan.get('start_time'))
+                end_dt = parse_time(plan.get('end_time'))
+
+                def near(target_dt, delta_minutes):
+                    if not target_dt:
+                        return False
+                    return abs((target_dt - now).total_seconds()) <= delta_minutes * 60
+
+                # Build messages based on reminder flags
+                if plan.get('reminder_at_start') and start_dt and near(start_dt, 1):
+                    for t in tokens:
+                        messages.append(push_service.build_message(
+                            t,
+                            f"It’s time: {plan.get('name')}",
+                            "Tap to start your session.",
+                            {'type': 'plan_start', 'plan_id': plan.get('id')}
+                        ))
+                if plan.get('reminder_at_end') and end_dt and near(end_dt, 1):
+                    for t in tokens:
+                        messages.append(push_service.build_message(
+                            t,
+                            f"Wrap up: {plan.get('name')}",
+                            "How did it go? Mark complete.",
+                            {'type': 'plan_end', 'plan_id': plan.get('id')}
+                        ))
+                before_mins = plan.get('reminder_before_minutes') or 0
+                if before_mins > 0 and start_dt:
+                    before_dt = start_dt - timedelta(minutes=before_mins)
+                    if near(before_dt, 1):
+                        for t in tokens:
+                            messages.append(push_service.build_message(
+                                t,
+                                f"Starting soon: {plan.get('name')}",
+                                f"Begins in {before_mins} minutes.",
+                                {'type': 'plan_before', 'plan_id': plan.get('id')}
+                            ))
+
+            if messages:
+                push_service.send_messages(messages)
+        except Exception as e:
+            print(f"Plan reminder scheduler error: {e}")
+
+    # Run every minute to catch start/end/5-min reminders
+    scheduler.add_job(send_plan_reminders, 'interval', minutes=1)
+
+    scheduler.start()
     
     port = int(os.getenv('PORT', 5000))
     debug = os.getenv('FLASK_DEBUG', 'True').lower() == 'true'

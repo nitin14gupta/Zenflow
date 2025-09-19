@@ -1,10 +1,12 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 
 import Constants from "expo-constants";
 
 import { Platform } from "react-native";
+import apiService from "../api/apiService";
+import { useAuth } from "../context/AuthContext";
 
 export interface PushNotificationState {
     expoPushToken?: Notifications.ExpoPushToken;
@@ -12,6 +14,7 @@ export interface PushNotificationState {
 }
 
 export const usePushNotifications = (): PushNotificationState => {
+    const { user } = useAuth();
     Notifications.setNotificationHandler({
         handleNotification: async () => ({
             shouldPlaySound: true,
@@ -69,6 +72,11 @@ export const usePushNotifications = (): PushNotificationState => {
     useEffect(() => {
         registerForPushNotificationsAsync().then((token) => {
             setExpoPushToken(token);
+            try {
+                if (token && (token as any).data) {
+                    console.log('Expo push token:', (token as any).data);
+                }
+            } catch { }
         });
 
         notificationListener.current =
@@ -89,6 +97,21 @@ export const usePushNotifications = (): PushNotificationState => {
             Notifications.removeNotificationSubscription(responseListener.current!);
         };
     }, []);
+
+    // Register token with backend whenever it changes or user logs in
+    useEffect(() => {
+        const registerToken = async () => {
+            try {
+                if (expoPushToken && (expoPushToken as any).data) {
+                    const tokenString = (expoPushToken as any).data as string;
+                    await apiService.registerPushToken(tokenString, user?.id);
+                }
+            } catch (e) {
+                console.log("Push token register error", e);
+            }
+        };
+        registerToken();
+    }, [expoPushToken, user?.id]);
 
     return {
         expoPushToken,

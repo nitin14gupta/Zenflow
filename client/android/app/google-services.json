@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "21753048200",
+    "project_id": "zenflownotification",
+    "storage_bucket": "zenflownotification.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:21753048200:android:1cff3afc4832d8a1cbc33d",
+        "android_client_info": {
+          "package_name": "com.zenflow.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDr9y_ckR6TF_54Sjh4ywKJIBdGjN-6d8g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

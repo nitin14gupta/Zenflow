@@ -30,6 +30,12 @@ export const API_CONFIG = {
 
         // Health check
         HEALTH: '/api/health',
+
+        // Push notifications
+        PUSH: {
+            REGISTER: '/api/push/register',
+            SEND_TEST: '/api/push/send-test',
+        },
     },
 
     // Request timeout (in milliseconds)

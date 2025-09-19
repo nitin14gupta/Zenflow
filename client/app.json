@@ -25,7 +25,8 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.zenflow.app"
+      "package": "com.zenflow.app",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "output": "static",

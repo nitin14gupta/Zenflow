@@ -4,6 +4,9 @@ import { useRouter } from 'expo-router';
 import { useToast } from '../../context/ToastContext';
 import { useAuth } from '../../context/AuthContext';
 import { colors } from '../../components/ui';
+import * as IAP from 'react-native-iap';
+import ConfettiCannon from 'react-native-confetti-cannon';
+import apiService from '../../api/apiService';
 
 const { width } = Dimensions.get('window');
 
@@ -23,18 +26,74 @@ export default function Subscription() {
     const { showToast } = useToast();
     const { user, refreshUser } = useAuth();
 
+    // Infinite auto-scroll (smooth)
     useEffect(() => {
-        const id = setInterval(() => {
-            const next = (index + 1) % images.length;
-            setIndex(next);
-            scrollRef.current?.scrollTo({ x: next * (width - 32), animated: true });
-        }, 2500);
-        return () => clearInterval(id);
-    }, [index]);
+        const timer = setInterval(() => {
+            setIndex((prev) => {
+                const next = (prev + 1) % images.length;
+                scrollRef.current?.scrollTo({ x: next * (width - 32), animated: true });
+                return next;
+            });
+        }, 2200);
+        return () => clearInterval(timer);
+    }, []);
 
-    const purchase = (plan: 'weekly' | 'yearly') => {
-        showToast('Payments are temporarily disabled. Please try again later.', 'info');
+    // IAP setup
+    useEffect(() => {
+        const connect = async () => {
+            try {
+                await IAP.initConnection();
+            } catch (e) {
+                console.log('IAP init error', e);
+            }
+        };
+        connect();
+        return () => { IAP.endConnection(); };
+    }, []);
+
+    const [confettiAt, setConfettiAt] = useState<number | null>(null);
+
+    const productIds = {
+        weekly: 'zenflow.weekly',
+        yearly: 'zenflow.yearly'
+    } as const;
+
+    const purchase = async (plan: 'weekly' | 'yearly') => {
+        try {
+            const sku = productIds[plan];
+            await IAP.requestSubscription({ sku });
+        } catch (e: any) {
+            console.log('IAP purchase error', e?.message || e);
+            showToast('Purchase failed or cancelled', 'error');
+        }
     };
+
+    // Listen to purchase updates and validate
+    useEffect(() => {
+        const sub = IAP.purchaseUpdatedListener(async (purchase) => {
+            try {
+                const receipt = purchase?.transactionReceipt;
+                const productId = (purchase as any)?.productId as string | undefined;
+                if (receipt && user?.id) {
+                    const res = await apiService.verifyIosReceipt(user.id, receipt, productId, __DEV__);
+                    if (res.success) {
+                        setConfettiAt(Date.now());
+                        await refreshUser();
+                        showToast('Welcome to ZenFlow Premium! 🎉', 'success');
+                        setTimeout(() => router.replace('/(tabs)'), 3000);
+                    } else {
+                        showToast(res.error || 'Verification failed', 'error');
+                    }
+                }
+            } catch (err) {
+                console.log('verify error', err);
+            }
+        });
+        const errSub = IAP.purchaseErrorListener((err) => {
+            console.log('IAP error', err);
+        });
+        return () => { sub.remove(); errSub.remove(); };
+    }, [user?.id, refreshUser, router]);
 
     const isExpired = () => {
         const exp = (user as any)?.subscription_expires_at;
@@ -147,6 +206,9 @@ export default function Subscription() {
                     </View>
                 </View>
             </ScrollView>
+            {confettiAt && (
+                <ConfettiCannon key={confettiAt} count={100} origin={{ x: width / 2, y: 0 }} fadeOut fallSpeed={3000} />
+            )}
         </View>
     );
 }

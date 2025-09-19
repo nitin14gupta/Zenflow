@@ -28,6 +28,11 @@ export const API_CONFIG = {
             ACTIVATE_TEST: '/api/payments/activate-test',
         },
 
+        // IAP
+        IAP: {
+            VERIFY_IOS: '/api/iap/verify-ios',
+        },
+
         // Health check
         HEALTH: '/api/health',
 

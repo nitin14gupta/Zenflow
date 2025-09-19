@@ -314,6 +314,14 @@ class ApiService {
             body: JSON.stringify({ plan })
         });
     }
+
+    // IAP
+    async verifyIosReceipt(userId: string, receiptData: string, productId?: string, sandbox: boolean = true): Promise<ApiResponse> {
+        return this.makeRequest(API_CONFIG.ENDPOINTS.IAP.VERIFY_IOS, {
+            method: 'POST',
+            body: JSON.stringify({ user_id: userId, receipt_data: receiptData, product_id: productId, sandbox })
+        });
+    }
 }
 
 // Export singleton instance

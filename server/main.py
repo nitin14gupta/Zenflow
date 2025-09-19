@@ -9,6 +9,7 @@ from routes.google_auth_routes import auth_google_bp
 from routes.apple_auth_routes import auth_apple_bp
 from routes.plan_routes import plan_bp
 from routes.push_routes import push_bp
+from routes.iap_routes import iap_bp
 from utils.push_service import push_service
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime, timedelta
@@ -30,6 +31,7 @@ def create_app():
     app.register_blueprint(auth_apple_bp)
     app.register_blueprint(plan_bp)
     app.register_blueprint(push_bp)
+    app.register_blueprint(iap_bp)
     
     # Health check endpoint
     @app.route('/api/health', methods=['GET'])

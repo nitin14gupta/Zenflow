@@ -23,6 +23,10 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
+      "notification": {
+        "icon": "./assets/images/habitLib1.png",
+        "color": "#111827"
+      },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.zenflow.app",
@@ -33,6 +37,7 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      "react-native-iap",
       [
         "expo-apple-authentication"
       ],
@@ -62,6 +67,7 @@
       "eas": {
         "projectId": "eeeb8295-3941-4244-a4a6-91587b7ed7b2"
       }
-    }
+    },
+    "owner": "sankalp465work"
   }
 }

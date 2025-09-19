@@ -10,6 +10,9 @@ const { width } = Dimensions.get('window');
 const images = [
     'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=1600&auto=format&fit=crop',
     'https://images.unsplash.com/photo-1507537297725-24a1c029d3ca?q=80&w=1600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d?q=80&w=1600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=1600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1507537297725-24a1c029d3ca?q=80&w=1600&auto=format&fit=crop',
     'https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d?q=80&w=1600&auto=format&fit=crop'
 ];
 
@@ -76,7 +79,7 @@ export default function Subscription() {
                     style={{ paddingHorizontal: 16 }}
                 >
                     {images.map((uri, i) => (
-                        <Image key={i} source={{ uri }} style={{ width: width - 32, height: 220, borderRadius: 16, marginRight: 12 }} />
+                        <Image key={i} source={{ uri }} style={{ width: 100, height: 220, borderRadius: 16, marginRight: 12 }} />
                     ))}
                 </ScrollView>
 
@@ -94,35 +97,48 @@ export default function Subscription() {
                         </Text>
                     )}
 
-                    {/* Pricing options / Extend options */}
-                    <View style={{ flexDirection: 'row', gap: 16, marginBottom: 20 }}>
-                        <View style={{ flex: 1, backgroundColor: 'white', borderRadius: 16, padding: 16, borderWidth: 2, borderColor: '#111827' }}>
-                            <Text style={{ alignSelf: 'flex-start', backgroundColor: '#111827', color: 'white', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4, fontFamily: 'Poppins_600SemiBold', fontSize: 12, marginBottom: 8 }}>Save 50 %</Text>
-                            <Text style={{ fontFamily: 'Poppins_700Bold', fontSize: 28, color: '#111827', marginBottom: 6 }}>12</Text>
-                            <Text style={{ fontFamily: 'Poppins_400Regular', fontSize: 12, color: '#6B7280', marginBottom: 2 }}>Months</Text>
-                            <Text style={{ fontFamily: 'Poppins_400Regular', fontSize: 12, color: '#6B7280' }}>₹7,700.00 / second year</Text>
-                            <Text style={{ fontFamily: 'Poppins_700Bold', fontSize: 16, color: '#111827' }}>₹3,550.00 / first year</Text>
-                            <Pressable onPress={() => purchase('yearly')} style={{ marginTop: 12, backgroundColor: '#111827', borderRadius: 10, paddingVertical: 10, alignItems: 'center' }}>
-                                <Text style={{ color: 'white', fontFamily: 'Poppins_600SemiBold' }}>{isPremium ? 'Extend Yearly' : 'Choose Yearly'}</Text>
-                            </Pressable>
-                        </View>
+                    {/* Pricing options / Extend options or Premium card */}
+                    {!isPremium ? (
+                        <View style={{ flexDirection: 'row', gap: 16, marginBottom: 20 }}>
+                            <View style={{ flex: 1, backgroundColor: 'white', borderRadius: 16, padding: 16, borderWidth: 2, borderColor: '#111827' }}>
+                                <Text style={{ alignSelf: 'flex-start', backgroundColor: '#111827', color: 'white', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4, fontFamily: 'Poppins_600SemiBold', fontSize: 12, marginBottom: 8 }}>Save 50 %</Text>
+                                <Text style={{ fontFamily: 'Poppins_700Bold', fontSize: 28, color: '#111827', marginBottom: 6 }}>12</Text>
+                                <Text style={{ fontFamily: 'Poppins_400Regular', fontSize: 12, color: '#6B7280', marginBottom: 2 }}>Months</Text>
+                                <Text style={{ fontFamily: 'Poppins_700Bold', fontSize: 16, color: '#111827' }}>₹3,550.00 / first year</Text>
+                                <Pressable onPress={() => purchase('yearly')} style={{ marginTop: 12, backgroundColor: '#111827', borderRadius: 10, paddingVertical: 10, alignItems: 'center' }}>
+                                    <Text style={{ color: 'white', fontFamily: 'Poppins_600SemiBold' }}>Choose Yearly</Text>
+                                </Pressable>
+                            </View>
 
-                        <View style={{ flex: 1, backgroundColor: 'white', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: '#E5E7EB' }}>
-                            <Text style={{ fontFamily: 'Poppins_700Bold', fontSize: 28, color: '#111827', marginBottom: 6 }}>1</Text>
-                            <Text style={{ fontFamily: 'Poppins_400Regular', fontSize: 12, color: '#6B7280', marginBottom: 2 }}>Week</Text>
-                            <Text style={{ fontFamily: 'Poppins_400Regular', fontSize: 12, color: '#6B7280' }}>₹1,400.00 / second week</Text>
-                            <Text style={{ fontFamily: 'Poppins_700Bold', fontSize: 16, color: '#111827' }}>₹700.00 / first week</Text>
-                            <Pressable onPress={() => purchase('weekly')} style={{ marginTop: 12, backgroundColor: '#111827', borderRadius: 10, paddingVertical: 10, alignItems: 'center' }}>
-                                <Text style={{ color: 'white', fontFamily: 'Poppins_600SemiBold' }}>{isPremium ? 'Extend Weekly' : 'Choose Weekly'}</Text>
-                            </Pressable>
+                            <View style={{ flex: 1, backgroundColor: 'white', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: '#E5E7EB' }}>
+                                <Text style={{ fontFamily: 'Poppins_700Bold', fontSize: 28, color: '#111827', marginBottom: 6 }}>1</Text>
+                                <Text style={{ fontFamily: 'Poppins_400Regular', fontSize: 12, color: '#6B7280', marginBottom: 2 }}>Week</Text>
+                                <Text style={{ fontFamily: 'Poppins_700Bold', fontSize: 16, color: '#111827' }}>₹700.00 / first week</Text>
+                                <Pressable onPress={() => purchase('weekly')} style={{ marginTop: 12, backgroundColor: '#111827', borderRadius: 10, paddingVertical: 10, alignItems: 'center' }}>
+                                    <Text style={{ color: 'white', fontFamily: 'Poppins_600SemiBold' }}>Choose Weekly</Text>
+                                </Pressable>
+                            </View>
                         </View>
-                    </View>
+                    ) : (
+                        <View style={{ backgroundColor: 'white', borderRadius: 16, padding: 20, borderWidth: 1, borderColor: '#E5E7EB', marginBottom: 20 }}>
+                            <Text style={{ fontFamily: 'Poppins_700Bold', fontSize: 18, color: '#111827', marginBottom: 6 }}>You’re Premium 🎉</Text>
+                            <Text style={{ fontFamily: 'Poppins_400Regular', fontSize: 13, color: '#6B7280', marginBottom: 12 }}>Enjoy unlimited access to ZenFlow features. Manage your plan or extend below.</Text>
+                            <View style={{ flexDirection: 'row', gap: 12 }}>
+                                <Pressable onPress={() => purchase('weekly')} style={{ flex: 1, backgroundColor: '#111827', borderRadius: 10, paddingVertical: 10, alignItems: 'center' }}>
+                                    <Text style={{ color: 'white', fontFamily: 'Poppins_600SemiBold' }}>Extend Weekly</Text>
+                                </Pressable>
+                                <Pressable onPress={() => purchase('yearly')} style={{ flex: 1, backgroundColor: '#111827', borderRadius: 10, paddingVertical: 10, alignItems: 'center' }}>
+                                    <Text style={{ color: 'white', fontFamily: 'Poppins_600SemiBold' }}>Extend Yearly</Text>
+                                </Pressable>
+                            </View>
+                        </View>
+                    )}
 
                     <View />
 
-                    <View style={{ alignItems: 'center', marginBottom: 12 }}>
+                    {/* <View style={{ alignItems: 'center', marginBottom: 12 }}>
                         <Text style={{ fontFamily: 'Poppins_600SemiBold', fontSize: 14, color: '#6B7280' }}>Cancel anytime</Text>
-                    </View>
+                    </View> */}
 
                     <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginBottom: 32 }}>
                         <Pressable onPress={() => router.push('/(settings)/terms')}><Text style={{ color: colors.purple, fontFamily: 'Poppins_600SemiBold', fontSize: 12 }}>Terms & Conditions</Text></Pressable>

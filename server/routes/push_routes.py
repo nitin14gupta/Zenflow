@@ -62,8 +62,8 @@ def send_test_push():
         messages = [{
             'to': t,
             'sound': 'default',
-            'title': data.get('title') or 'Zenflow Test',
-            'body': data.get('body') or 'This is a test notification from Zenflow server',
+            'title': data.get('title') or 'Zenflow',
+            'body': data.get('body') or 'Welcome to Zenflow',
             'data': data.get('data') or {'_test': True},
         } for t in target_tokens]
 

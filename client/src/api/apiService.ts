@@ -140,6 +140,26 @@ class ApiService {
         return response;
     }
 
+    async loginWithApple(identityToken: string, rawNonce: string, givenName?: string, familyName?: string, email?: string): Promise<ApiResponse<AuthResponse>> {
+        const response = await this.makeRequest<AuthResponse>(API_CONFIG.ENDPOINTS.AUTH.APPLE, {
+            method: 'POST',
+            body: JSON.stringify({
+                identityToken,
+                rawNonce,
+                givenName,
+                familyName,
+                email
+            }),
+        });
+
+        if (response.success && response.data?.token) {
+            await this.setAuthToken(response.data.token);
+            await AsyncStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(response.data.user));
+        }
+
+        return response;
+    }
+
     async forgotPassword(email: string): Promise<ApiResponse> {
         return this.makeRequest(API_CONFIG.ENDPOINTS.AUTH.FORGOT_PASSWORD, {
             method: 'POST',

@@ -5,12 +5,16 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "zenflow",
+    "scheme": "app",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.zenflow.app"
+      "bundleIdentifier": "com.zenflow.app",
+      "usesAppleSignIn": "true",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -28,6 +32,9 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      [
+        "expo-apple-authentication"
+      ],
       "expo-router",
       [
         "expo-splash-screen",
@@ -49,10 +56,10 @@
     "extra": {
       "router": {},
       "env": {
-        "EXPO_PUBLIC_API_BASE_URL": "http://192.168.0.105:5000"
+        "EXPO_PUBLIC_API_BASE_URL": "http://192.168.0.103:5000"
       },
       "eas": {
-        "projectId": "90a72d72-ec75-4d89-a3b5-1fc68065c77d"
+        "projectId": "eeeb8295-3941-4244-a4a6-91587b7ed7b2"
       }
     }
   }

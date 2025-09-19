@@ -7,16 +7,15 @@ import { useAuth } from "../../context/AuthContext";
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 import { makeRedirectUri } from "expo-auth-session";
-
-// android : 746039886902-5vlmhjn76mgoopgfru5l7q51t6c0j7ep.apps.googleusercontent.com
-// ios : 746039886902-nh57ar0unrl0a1bnc7ktj363855oljh9.apps.googleusercontent.com
+import * as AppleAuthentication from 'expo-apple-authentication';
+import { Platform } from 'react-native';
 
 WebBrowser.maybeCompleteAuthSession();
 
 export default function Login() {
     const router = useRouter();
     const { showToast } = useToast();
-    const { login, loginWithGoogle, isLoading } = useAuth();
+    const { login, loginWithGoogle, loginWithApple, isLoading } = useAuth();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPass, setShowPass] = useState(false);
@@ -76,6 +75,47 @@ export default function Login() {
             await promptAsync({ useProxy: false, redirectUri });
         } catch (e) {
             showToast("Unable to start Google sign-in", "error");
+        }
+    };
+
+    const onApplePress = async () => {
+        try {
+            if (Platform.OS !== 'ios') {
+                showToast("Apple Sign-In is only available on iOS", "error");
+                return;
+            }
+
+            const rawNonce = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+            const credential = await AppleAuthentication.signInAsync({
+                requestedScopes: [
+                    AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+                    AppleAuthentication.AppleAuthenticationScope.EMAIL,
+                ],
+                nonce: rawNonce,
+            });
+
+            if (credential.identityToken) {
+                const result = await loginWithApple(
+                    credential.identityToken,
+                    rawNonce,
+                    credential.fullName?.givenName,
+                    credential.fullName?.familyName,
+                    credential.email
+                );
+
+                if (result.success) {
+                    showToast("Welcome back! 🎉", "success");
+                    router.replace("/(tabs)");
+                } else {
+                    showToast(result.error || "Apple sign-in failed", "error");
+                }
+            }
+        } catch (e: any) {
+            if (e.code === 'ERR_REQUEST_CANCELED') {
+                showToast("Apple sign-in cancelled", "error");
+            } else {
+                showToast("Unable to start Apple sign-in", "error");
+            }
         }
     };
 
@@ -191,6 +231,22 @@ export default function Login() {
                         'Continue with Google'
                     )}
                 </Button>
+
+                {Platform.OS === 'ios' && (
+                    <>
+                        <View style={{ marginVertical: 16, alignItems: 'center' }}>
+                            <Text style={{ color: '#9CA3AF', fontFamily: 'Poppins_400Regular' }}>or</Text>
+                        </View>
+
+                        <AppleAuthentication.AppleAuthenticationButton
+                            buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+                            buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+                            cornerRadius={12}
+                            style={{ width: '100%', height: 50 }}
+                            onPress={onApplePress}
+                        />
+                    </>
+                )}
 
                 <View style={{ marginTop: 24, alignItems: 'center' }}>
                     <Text style={{ color: '#6B7280', fontSize: 14, fontFamily: 'Poppins_400Regular', marginBottom: 8 }}>

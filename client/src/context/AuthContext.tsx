@@ -10,6 +10,7 @@ type AuthContextValue = {
     login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
     register: (email: string, password: string, onboardingData?: any) => Promise<{ success: boolean; error?: string }>;
     loginWithGoogle: (idToken: string) => Promise<{ success: boolean; error?: string }>;
+    loginWithApple: (identityToken: string, rawNonce: string, givenName?: string, familyName?: string, email?: string) => Promise<{ success: boolean; error?: string }>;
     logout: () => Promise<void>;
     refreshUser: () => Promise<void>;
     updateOnboardingData: (data: any) => Promise<{ success: boolean; error?: string }>;
@@ -69,6 +70,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 return { success: true };
             }
             return { success: false, error: response.error || 'Google sign-in failed' };
+        } catch (error) {
+            return { success: false, error: 'Network error. Please check your connection.' };
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    const loginWithApple = useCallback(async (identityToken: string, rawNonce: string, givenName?: string, familyName?: string, email?: string) => {
+        try {
+            setIsLoading(true);
+            const response = await apiService.loginWithApple(identityToken, rawNonce, givenName, familyName, email);
+            if (response.success && response.data) {
+                setUser(response.data.user);
+                return { success: true };
+            }
+            return { success: false, error: response.error || 'Apple sign-in failed' };
         } catch (error) {
             return { success: false, error: 'Network error. Please check your connection.' };
         } finally {
@@ -137,10 +154,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         login,
         register,
         loginWithGoogle,
+        loginWithApple,
         logout,
         refreshUser,
         updateOnboardingData,
-    }), [user, isAuthenticated, isLoading, login, register, loginWithGoogle, logout, refreshUser, updateOnboardingData]);
+    }), [user, isAuthenticated, isLoading, login, register, loginWithGoogle, loginWithApple, logout, refreshUser, updateOnboardingData]);
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

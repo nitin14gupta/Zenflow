@@ -6,6 +6,7 @@ import asyncio
 from db.config import db_config
 from routes.auth_routes import auth_bp
 from routes.google_auth_routes import auth_google_bp
+from routes.apple_auth_routes import auth_apple_bp
 from routes.plan_routes import plan_bp
 
 # Load environment variables
@@ -20,6 +21,7 @@ def create_app():
     # Register blueprints
     app.register_blueprint(auth_bp)
     app.register_blueprint(auth_google_bp)
+    app.register_blueprint(auth_apple_bp)
     app.register_blueprint(plan_bp)
     
     # Health check endpoint

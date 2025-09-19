@@ -38,7 +38,10 @@ class DatabaseConfig:
                     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
                     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
                     is_verified BOOLEAN DEFAULT FALSE,
-                    onboarding_data JSONB
+                    onboarding_data JSONB,
+                    is_premium BOOLEAN DEFAULT FALSE,
+                    subscription_plan VARCHAR(20),
+                    subscription_expires_at TIMESTAMP WITH TIME ZONE  
                 );
                 
                 CREATE TABLE password_reset_tokens (

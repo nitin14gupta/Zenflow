@@ -38,6 +38,17 @@ export const usePushNotifications = (): PushNotificationState => {
     async function registerForPushNotificationsAsync() {
         let token;
         if (Device.isDevice) {
+            // Android 13+: create a channel BEFORE requesting permissions or tokens
+            if (Platform.OS === "android") {
+                try {
+                    await Notifications.setNotificationChannelAsync("default", {
+                        name: "default",
+                        importance: Notifications.AndroidImportance.MAX,
+                        vibrationPattern: [0, 250, 250, 250],
+                        lightColor: "#FF231F7C",
+                    });
+                } catch { }
+            }
             const { status: existingStatus } =
                 await Notifications.getPermissionsAsync();
             let finalStatus = existingStatus;
@@ -56,15 +67,6 @@ export const usePushNotifications = (): PushNotificationState => {
             });
         } else {
             alert("Must be using a physical device for Push notifications");
-        }
-
-        if (Platform.OS === "android") {
-            Notifications.setNotificationChannelAsync("default", {
-                name: "default",
-                importance: Notifications.AndroidImportance.MAX,
-                vibrationPattern: [0, 250, 250, 250],
-                lightColor: "#FF231F7C",
-            });
         }
 
         return token;

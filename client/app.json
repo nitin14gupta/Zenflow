@@ -11,7 +11,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.zenflow.app",
-      "usesAppleSignIn": "true",
+      "usesAppleSignIn": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -23,10 +23,6 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "notification": {
-        "icon": "./assets/images/habitLib1.png",
-        "color": "#111827"
-      },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.zenflow.app",
@@ -37,6 +33,19 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/habitLib1.png",
+          "color": "#ffffff",
+          "defaultChannel": "default",
+          "sounds": [
+            "./assets/notifications/notification_sound.wav",
+            "./assets/notifications/notification_sound_other.wav"
+          ],
+          "enableBackgroundRemoteNotifications": true
+        }
+      ],
       "react-native-iap",
       [
         "expo-apple-authentication"

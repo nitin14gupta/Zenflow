@@ -30,22 +30,13 @@ export default function Home() {
   const didSendTestPushRef = useRef(false);
   const didPreloadRef = useRef(false);
 
-  // Fire a one-time test push on first load if token is available
   useEffect(() => {
     // Preload bundled assets once at startup for snappy UX
     if (!didPreloadRef.current) {
       didPreloadRef.current = true;
       preloadBundledAssetsIfNeeded();
     }
-    try {
-      const token = (expoPushToken as any)?.data as string | undefined;
-      if (!didSendTestPushRef.current && token) {
-        didSendTestPushRef.current = true;
-        console.log('Triggering test push to token:', token);
-        apiService.sendTestPush(token, undefined, 'ZenFlow Test', 'Push is working ✅');
-      }
-    } catch { }
-  }, [expoPushToken]);
+  }, []);
 
   const parseISODate = (dateStr?: string) => {
     if (!dateStr) return null;

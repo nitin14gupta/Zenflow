@@ -119,7 +119,7 @@ export default function Settings() {
                     </Text>
                     <Text style={{
                         fontFamily: 'Poppins_400Regular',
-                        fontSize: 14,
+                        fontSize: 12,
                         color: '#6B7280'
                     }}>
                         Manage your account and preferences

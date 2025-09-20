@@ -1,5 +1,5 @@
 import React, { PropsWithChildren, useEffect, useRef } from "react";
-import { Pressable, Text, View, ViewProps, Animated } from "react-native";
+import { Pressable, Text, View, ViewProps, Animated, TextInput } from "react-native";
 import * as Haptics from "expo-haptics";
 
 export const colors = {
@@ -150,11 +150,11 @@ export const SocialButton: React.FC<SocialButtonProps> = ({
         if (loading) return "⏳";
         switch (variant) {
             case "google":
-                return "🔍"; // Google icon placeholder
+                return ""; // Google G icon
             case "apple":
-                return "🍎"; // Apple icon placeholder
+                return "🍎"; // Apple icon
             default:
-                return "🔍";
+                return "G";
         }
     };
 
@@ -182,7 +182,23 @@ export const SocialButton: React.FC<SocialButtonProps> = ({
                 },
                 getButtonStyle()
             ]}>
-                <Text style={{ fontSize: 18, marginRight: 12 }}>{getIcon()}</Text>
+                <View style={{
+                    width: 20,
+                    height: 20,
+                    borderRadius: variant === "google" ? 10 : 0,
+                    backgroundColor: variant === "google" ? "#4285F4" : "transparent",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginRight: 12
+                }}>
+                    <Text style={{
+                        fontSize: variant === "google" ? 12 : 16,
+                        fontWeight: "bold",
+                        color: variant === "google" ? "white" : "black"
+                    }}>
+                        {getIcon()}
+                    </Text>
+                </View>
                 <Text style={{
                     color: getTextColor(),
                     textAlign: "center",

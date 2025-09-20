@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Pressable, Text, TextInput, View, ActivityIndicator, ScrollView } from "react-native";
-import { ScreenContainer, Title, Button, Subtitle, colors } from "../../components/ui";
+import { ScreenContainer, Title, Button, Subtitle, colors, SocialButton } from "../../components/ui";
 import { useRouter } from "expo-router";
 import { useToast } from "../../context/ToastContext";
 import { useOnboarding } from "../../context/OnboardingContext";
@@ -24,7 +24,7 @@ export default function Register() {
     const [showPass, setShowPass] = useState(false);
     const [showConfirmPass, setShowConfirmPass] = useState(false);
 
-    const redirectUri = makeRedirectUri({ useProxy: false });
+    const redirectUri = makeRedirectUri();
     const [request, response, promptAsync] = Google.useAuthRequest({
         iosClientId: "746039886902-nh57ar0unrl0a1bnc7ktj363855oljh9.apps.googleusercontent.com",
         androidClientId: "746039886902-5vlmhjn76mgoopgfru5l7q51t6c0j7ep.apps.googleusercontent.com",
@@ -78,7 +78,7 @@ export default function Register() {
 
     const onGooglePress = async () => {
         try {
-            await promptAsync({ useProxy: false, redirectUri });
+            await promptAsync();
         } catch (e) {
             showToast("Unable to start Google sign-in", "error");
         }
@@ -104,9 +104,9 @@ export default function Register() {
                 const result = await loginWithApple(
                     credential.identityToken,
                     rawNonce,
-                    credential.fullName?.givenName,
-                    credential.fullName?.familyName,
-                    credential.email
+                    credential.fullName?.givenName || undefined,
+                    credential.fullName?.familyName || undefined,
+                    credential.email || undefined
                 );
 
                 if (result.success) {
@@ -253,18 +253,14 @@ export default function Register() {
                     <Text style={{ color: '#9CA3AF', fontFamily: 'Poppins_400Regular' }}>or</Text>
                 </View>
 
-                <Button onPress={onGooglePress} disabled={isLoading || !request}>
-                    {isLoading ? (
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                            <ActivityIndicator size="small" color="white" />
-                            <Text style={{ color: 'white', fontFamily: 'Poppins_600SemiBold', fontSize: 16 }}>
-                                Connecting Google...
-                            </Text>
-                        </View>
-                    ) : (
-                        'Continue with Google'
-                    )}
-                </Button>
+                <SocialButton
+                    variant="google"
+                    onPress={onGooglePress}
+                    disabled={isLoading || !request}
+                    loading={isLoading}
+                >
+                    Continue with Google
+                </SocialButton>
 
                 {Platform.OS === 'ios' && (
                     <>
@@ -272,13 +268,14 @@ export default function Register() {
                             <Text style={{ color: '#9CA3AF', fontFamily: 'Poppins_400Regular' }}>or</Text>
                         </View>
 
-                        <AppleAuthentication.AppleAuthenticationButton
-                            buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
-                            buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
-                            cornerRadius={12}
-                            style={{ width: '100%', height: 50 }}
+                        <SocialButton
+                            variant="apple"
                             onPress={onApplePress}
-                        />
+                            disabled={isLoading}
+                            loading={isLoading}
+                        >
+                            Continue with Apple
+                        </SocialButton>
                     </>
                 )}
 

@@ -3,26 +3,132 @@ import { Platform } from "react-native";
 
 export default function RootLayout() {
   return (
-    <Stack>
-      <Stack.Screen name="age" options={{ headerShown: false, animation: Platform.select({ ios: "slide_from_right", android: "slide_from_right" }) }} />
-      <Stack.Screen name="gender" options={{ headerShown: false }} />
-      <Stack.Screen name="welcome" options={{ headerShown: false }} />
-      <Stack.Screen name="sleep" options={{ headerShown: false }} />
-      <Stack.Screen name="morning" options={{ headerShown: false }} />
-      <Stack.Screen name="energy" options={{ headerShown: false }} />
-      <Stack.Screen name="lifestyle" options={{ headerShown: false }} />
-      <Stack.Screen name="goals" options={{ headerShown: false }} />
-      <Stack.Screen name="motivation" options={{ headerShown: false }} />
-      <Stack.Screen name="distractions" options={{ headerShown: false }} />
-      <Stack.Screen name="procrastination" options={{ headerShown: false }} />
-      <Stack.Screen name="statistics" options={{ headerShown: false }} />
-      <Stack.Screen name="desires" options={{ headerShown: false }} />
-      <Stack.Screen name="statement1" options={{ headerShown: false }} />
-      <Stack.Screen name="statement2" options={{ headerShown: false }} />
-      <Stack.Screen name="statement3" options={{ headerShown: false }} />
-      <Stack.Screen name="statement4" options={{ headerShown: false }} />
-      <Stack.Screen name="ready" options={{ headerShown: false }} />
-      <Stack.Screen name="final" options={{ headerShown: false }} />
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        animation: Platform.select({
+          ios: "slide_from_right",
+          android: "slide_from_right"
+        }),
+        animationDuration: 300,
+        gestureEnabled: true,
+        gestureDirection: 'horizontal',
+      }}
+    >
+      <Stack.Screen name="age" options={{
+        animation: Platform.select({
+          ios: "slide_from_right",
+          android: "slide_from_right"
+        })
+      }} />
+      <Stack.Screen name="gender" options={{
+        animation: Platform.select({
+          ios: "slide_from_right",
+          android: "slide_from_right"
+        })
+      }} />
+      <Stack.Screen name="welcome" options={{
+        animation: Platform.select({
+          ios: "slide_from_right",
+          android: "slide_from_right"
+        })
+      }} />
+      <Stack.Screen name="sleep" options={{
+        animation: Platform.select({
+          ios: "slide_from_right",
+          android: "slide_from_right"
+        })
+      }} />
+      <Stack.Screen name="morning" options={{
+        animation: Platform.select({
+          ios: "slide_from_right",
+          android: "slide_from_right"
+        })
+      }} />
+      <Stack.Screen name="energy" options={{
+        animation: Platform.select({
+          ios: "slide_from_right",
+          android: "slide_from_right"
+        })
+      }} />
+      <Stack.Screen name="lifestyle" options={{
+        animation: Platform.select({
+          ios: "slide_from_right",
+          android: "slide_from_right"
+        })
+      }} />
+      <Stack.Screen name="goals" options={{
+        animation: Platform.select({
+          ios: "slide_from_right",
+          android: "slide_from_right"
+        })
+      }} />
+      <Stack.Screen name="motivation" options={{
+        animation: Platform.select({
+          ios: "slide_from_right",
+          android: "slide_from_right"
+        })
+      }} />
+      <Stack.Screen name="distractions" options={{
+        animation: Platform.select({
+          ios: "slide_from_right",
+          android: "slide_from_right"
+        })
+      }} />
+      <Stack.Screen name="procrastination" options={{
+        animation: Platform.select({
+          ios: "slide_from_right",
+          android: "slide_from_right"
+        })
+      }} />
+      <Stack.Screen name="statistics" options={{
+        animation: Platform.select({
+          ios: "slide_from_right",
+          android: "slide_from_right"
+        })
+      }} />
+      <Stack.Screen name="desires" options={{
+        animation: Platform.select({
+          ios: "slide_from_right",
+          android: "slide_from_right"
+        })
+      }} />
+      <Stack.Screen name="statement1" options={{
+        animation: Platform.select({
+          ios: "slide_from_right",
+          android: "slide_from_right"
+        })
+      }} />
+      <Stack.Screen name="statement2" options={{
+        animation: Platform.select({
+          ios: "slide_from_right",
+          android: "slide_from_right"
+        })
+      }} />
+      <Stack.Screen name="statement3" options={{
+        animation: Platform.select({
+          ios: "slide_from_right",
+          android: "slide_from_right"
+        })
+      }} />
+      <Stack.Screen name="statement4" options={{
+        animation: Platform.select({
+          ios: "slide_from_right",
+          android: "slide_from_right"
+        })
+      }} />
+      <Stack.Screen name="ready" options={{
+        animation: Platform.select({
+          ios: "slide_from_right",
+          android: "slide_from_right"
+        })
+      }} />
+      <Stack.Screen name="final" options={{
+        animation: Platform.select({
+          ios: "fade",
+          android: "fade"
+        })
+      }} />
     </Stack>
   )
 }

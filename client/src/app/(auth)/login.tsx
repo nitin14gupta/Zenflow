@@ -252,7 +252,7 @@ export default function Login() {
                     <Text style={{ color: '#6B7280', fontSize: 14, fontFamily: 'Poppins_400Regular', marginBottom: 8 }}>
                         Don't have an account?
                     </Text>
-                    <Pressable onPress={() => router.replace("/(auth)/register")}>
+                    <Pressable onPress={() => router.replace("/(onboarding)/age")}>
                         <Text style={{ color: colors.purple, fontFamily: 'Poppins_600SemiBold', fontSize: 16 }}>
                             Create Account
                         </Text>

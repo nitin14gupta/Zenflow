@@ -42,77 +42,101 @@ export default function Settings() {
             style={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                paddingVertical: 16,
+                paddingVertical: 18,
                 paddingHorizontal: 20,
                 backgroundColor: 'white',
-                borderRadius: 12,
+                borderRadius: 16,
                 marginBottom: 12,
                 shadowColor: '#000',
-                shadowOffset: { width: 0, height: 1 },
+                shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: 0.05,
-                shadowRadius: 2,
-                elevation: 2
+                shadowRadius: 4,
+                elevation: 2,
+                borderWidth: 1,
+                borderColor: '#F3F4F6'
             }}
         >
-            <Text style={{ fontSize: 20, marginRight: 16, color: '#6B7280' }}>{icon}</Text>
+            <View style={{
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+                backgroundColor: '#F8FAFC',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginRight: 16
+            }}>
+                <Text style={{ fontSize: 20, color: '#6B7280' }}>{icon}</Text>
+            </View>
             <Text style={{
-                fontFamily: 'Poppins_400Regular',
+                fontFamily: 'Poppins_500Medium',
                 fontSize: 16,
                 color: '#111827',
                 flex: 1
             }}>
                 {title}
             </Text>
-            <Text style={{ fontSize: 16, color: '#9CA3AF' }}>›</Text>
+            <Text style={{ fontSize: 18, color: '#9CA3AF' }}>›</Text>
         </Pressable>
     );
 
     return (
-        <View style={{ flex: 1, backgroundColor: '#FFF9F0' }}>
-            <StatusBar barStyle="dark-content" backgroundColor="#FFF9F0" />
+        <View style={{ flex: 1, backgroundColor: '#F8FAFC' }}>
+            <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
 
             {/* Header */}
             <View style={{
-                paddingTop: 25,
-                paddingHorizontal: 20,
-                paddingBottom: 20,
+                paddingTop: 20,
+                paddingHorizontal: 24,
+                paddingBottom: 24,
                 flexDirection: 'row',
-                alignItems: 'center'
+                alignItems: 'center',
+                backgroundColor: 'white',
+                borderBottomWidth: 1,
+                borderBottomColor: '#E5E7EB'
             }}>
                 <Pressable
                     onPress={() => router.back()}
                     style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 20,
-                        backgroundColor: colors.primary,
+                        width: 44,
+                        height: 44,
+                        borderRadius: 22,
+                        backgroundColor: '#F3F4F6',
                         alignItems: 'center',
                         justifyContent: 'center',
                         marginRight: 16
                     }}
                 >
-                    <Text style={{ fontSize: 18, color: '#6B7280' }}>✕</Text>
+                    <Text style={{ fontSize: 20, color: '#6B7280' }}>←</Text>
                 </Pressable>
-                <Text style={{
-                    fontFamily: 'Poppins_700Bold',
-                    fontSize: 24,
-                    color: '#111827',
-                    flex: 1
-                }}>
-                    Account Settings
-                </Text>
-            </View>
-
-            <ScrollView style={{ flex: 1, paddingHorizontal: 20 }}>
-                {/* Account Settings Section */}
-                <View style={{ marginBottom: 32 }}>
+                <View style={{ flex: 1 }}>
                     <Text style={{
                         fontFamily: 'Poppins_700Bold',
-                        fontSize: 20,
+                        fontSize: 28,
+                        color: '#111827',
+                        marginBottom: 4
+                    }}>
+                        Settings
+                    </Text>
+                    <Text style={{
+                        fontFamily: 'Poppins_400Regular',
+                        fontSize: 14,
+                        color: '#6B7280'
+                    }}>
+                        Manage your account and preferences
+                    </Text>
+                </View>
+            </View>
+
+            <ScrollView style={{ flex: 1, paddingHorizontal: 24 }}>
+                {/* Account Settings Section */}
+                <View style={{ marginTop: 20, marginBottom: 32 }}>
+                    <Text style={{
+                        fontFamily: 'Poppins_700Bold',
+                        fontSize: 18,
                         color: '#111827',
                         marginBottom: 16
                     }}>
-                        Account Settings
+                        Account
                     </Text>
 
                     <SettingItem
@@ -131,11 +155,11 @@ export default function Settings() {
                 <View style={{ marginBottom: 32 }}>
                     <Text style={{
                         fontFamily: 'Poppins_700Bold',
-                        fontSize: 20,
+                        fontSize: 18,
                         color: '#111827',
                         marginBottom: 16
                     }}>
-                        Habit Management
+                        Data Management
                     </Text>
 
                     <SettingItem
@@ -149,11 +173,11 @@ export default function Settings() {
                 <View style={{ marginBottom: 32 }}>
                     <Text style={{
                         fontFamily: 'Poppins_700Bold',
-                        fontSize: 20,
+                        fontSize: 18,
                         color: '#111827',
                         marginBottom: 16
                     }}>
-                        User Support
+                        Support & Legal
                     </Text>
 
                     <SettingItem
@@ -178,15 +202,17 @@ export default function Settings() {
                     onPress={handleLogout}
                     style={{
                         backgroundColor: 'white',
-                        borderRadius: 12,
-                        paddingVertical: 16,
+                        borderRadius: 16,
+                        paddingVertical: 18,
                         alignItems: 'center',
                         marginBottom: 40,
                         shadowColor: '#000',
-                        shadowOffset: { width: 0, height: 1 },
+                        shadowOffset: { width: 0, height: 2 },
                         shadowOpacity: 0.05,
-                        shadowRadius: 2,
-                        elevation: 2
+                        shadowRadius: 4,
+                        elevation: 2,
+                        borderWidth: 1,
+                        borderColor: '#FEE2E2'
                     }}
                 >
                     <Text style={{
@@ -194,7 +220,7 @@ export default function Settings() {
                         fontSize: 16,
                         color: '#EF4444'
                     }}>
-                        Logout
+                        Sign Out
                     </Text>
                 </Pressable>
             </ScrollView>

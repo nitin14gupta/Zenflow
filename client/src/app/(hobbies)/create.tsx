@@ -76,97 +76,125 @@ export default function CreatePlan() {
                 </View>
             </View>
 
-            <ScrollView style={{ flex: 1, paddingHorizontal: 20 }}>
+            <ScrollView style={{ flex: 1, paddingHorizontal: 24 }}>
                 {/* Input Field */}
                 <View style={{
                     backgroundColor: 'white',
-                    borderRadius: 16,
-                    padding: 20,
-                    marginBottom: 24,
+                    borderRadius: 20,
+                    padding: 24,
+                    marginTop: 20,
+                    marginBottom: 32,
                     shadowColor: '#000',
-                    shadowOffset: { width: 0, height: 2 },
+                    shadowOffset: { width: 0, height: 4 },
                     shadowOpacity: 0.1,
-                    shadowRadius: 4,
+                    shadowRadius: 8,
                     elevation: 4
                 }}>
+                    <Text style={{
+                        fontFamily: 'Poppins_600SemiBold',
+                        fontSize: 16,
+                        color: '#374151',
+                        marginBottom: 12
+                    }}>
+                        What would you like to do?
+                    </Text>
                     <TextInput
                         value={planName}
                         onChangeText={setPlanName}
-                        placeholder="Enter your plan..."
+                        placeholder="Enter your habit or activity..."
                         style={{
                             fontFamily: 'Poppins_400Regular',
                             fontSize: 16,
                             color: '#111827',
-                            minHeight: 40
+                            minHeight: 50,
+                            backgroundColor: '#F8FAFC',
+                            borderRadius: 12,
+                            paddingHorizontal: 16,
+                            paddingVertical: 12
                         }}
                         placeholderTextColor="#9CA3AF"
+                        multiline
                     />
                 </View>
 
                 {/* Suggestions */}
-                <Text style={{
-                    fontFamily: 'Poppins_700Bold',
-                    fontSize: 16,
-                    color: '#111827',
-                    marginBottom: 16
-                }}>
-                    SUGGESTIONS
-                </Text>
+                <View style={{ marginBottom: 32 }}>
+                    <Text style={{
+                        fontFamily: 'Poppins_700Bold',
+                        fontSize: 18,
+                        color: '#111827',
+                        marginBottom: 16
+                    }}>
+                        Popular Suggestions
+                    </Text>
 
-                <View style={{ gap: 12, marginBottom: 40 }}>
-                    {suggestions.map((suggestion) => (
-                        <Pressable
-                            key={suggestion.id}
-                            onPress={() => handleSuggestionPress(suggestion)}
-                            style={{
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                backgroundColor: 'white',
-                                borderRadius: 12,
-                                padding: 16,
-                                shadowColor: '#000',
-                                shadowOffset: { width: 0, height: 1 },
-                                shadowOpacity: 0.05,
-                                shadowRadius: 2,
-                                elevation: 2
-                            }}
-                        >
-                            <Text style={{ fontSize: 24, marginRight: 16 }}>{suggestion.emoji}</Text>
-                            <Text style={{
-                                fontFamily: 'Poppins_400Regular',
-                                fontSize: 16,
-                                color: '#111827',
-                                flex: 1
-                            }}>
-                                {suggestion.title}
-                            </Text>
-                            <Pressable style={{
-                                width: 32,
-                                height: 32,
-                                borderRadius: 16,
-                                backgroundColor: '#F3F4F6',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}>
-                                <Text style={{ fontSize: 16, color: '#6B7280' }}>+</Text>
+                    <View style={{ gap: 12 }}>
+                        {suggestions.map((suggestion) => (
+                            <Pressable
+                                key={suggestion.id}
+                                onPress={() => handleSuggestionPress(suggestion)}
+                                style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    backgroundColor: 'white',
+                                    borderRadius: 16,
+                                    padding: 20,
+                                    shadowColor: '#000',
+                                    shadowOffset: { width: 0, height: 2 },
+                                    shadowOpacity: 0.05,
+                                    shadowRadius: 4,
+                                    elevation: 2,
+                                    borderWidth: 1,
+                                    borderColor: '#F3F4F6'
+                                }}
+                            >
+                                <View style={{
+                                    width: 48,
+                                    height: 48,
+                                    borderRadius: 24,
+                                    backgroundColor: '#F8FAFC',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    marginRight: 16
+                                }}>
+                                    <Text style={{ fontSize: 24 }}>{suggestion.emoji}</Text>
+                                </View>
+                                <Text style={{
+                                    fontFamily: 'Poppins_500Medium',
+                                    fontSize: 16,
+                                    color: '#111827',
+                                    flex: 1
+                                }}>
+                                    {suggestion.title}
+                                </Text>
+                                <View style={{
+                                    width: 36,
+                                    height: 36,
+                                    borderRadius: 18,
+                                    backgroundColor: '#F3F4F6',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}>
+                                    <Text style={{ fontSize: 18, color: '#6B7280' }}>+</Text>
+                                </View>
                             </Pressable>
-                        </Pressable>
-                    ))}
+                        ))}
+                    </View>
                 </View>
 
                 {/* Continue Button */}
                 <Pressable
                     onPress={handleContinue}
                     style={{
-                        backgroundColor: '#374151',
-                        borderRadius: 12,
-                        paddingVertical: 16,
+                        backgroundColor: '#111827',
+                        borderRadius: 16,
+                        paddingVertical: 18,
                         alignItems: 'center',
                         marginBottom: 40,
                         shadowColor: '#000',
-                        shadowOffset: { width: 0, height: 2 },
-                        shadowOpacity: 0.1,
-                        shadowRadius: 4,
+                        shadowOffset: { width: 0, height: 4 },
+                        shadowOpacity: 0.2,
+                        shadowRadius: 8,
                         elevation: 4
                     }}
                 >
@@ -175,7 +203,7 @@ export default function CreatePlan() {
                         fontSize: 16,
                         color: 'white'
                     }}>
-                        Continue
+                        Continue to Setup
                     </Text>
                 </Pressable>
             </ScrollView>

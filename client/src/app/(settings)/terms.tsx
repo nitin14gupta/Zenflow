@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Pressable, ScrollView, StatusBar } from 'react-native';
 import { colors } from '../../components/ui';
 import { useRouter } from 'expo-router';
+import { Ionicons, AntDesign } from '@expo/vector-icons';
 
 export default function Terms() {
     const router = useRouter();
@@ -30,7 +31,7 @@ export default function Terms() {
                         marginRight: 16
                     }}
                 >
-                    <Text style={{ fontSize: 18, color: '#6B7280' }}>‹</Text>
+                    <Ionicons name="chevron-back-outline" size={20} color="#6B7280" />
                 </Pressable>
                 <Text style={{
                     fontFamily: 'Poppins_700Bold',

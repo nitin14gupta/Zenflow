@@ -5,6 +5,7 @@ import { apiService } from '../../api/apiService';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons, AntDesign } from '@expo/vector-icons';
 
 // Packs shown as large image cards
 // Images reference app assets; replace with real artwork when available
@@ -97,6 +98,126 @@ const habitPacks: HabitPack[] = [
             { id: 'h-22', title: 'Declutter one small area', emoji: '🧺' },
         ],
     },
+    // {
+    //     id: 'pack-7',
+    //     title: 'Better Sleep Tonight',
+    //     subtitle: 'Wind down the right way',
+    //     description: 'Habits to calm your body and mind for restful sleep.',
+    //     image: require('../../../assets/images/habitLib4.png'),
+    //     habits: [
+    //         { id: 'h-23', title: 'No caffeine after 6 PM', emoji: '☕' },
+    //         { id: 'h-24', title: 'Digital sunset (no screens 1 hr before bed)', emoji: '📴' },
+    //         { id: 'h-25', title: 'Read or journal before bed', emoji: '📖' },
+    //     ],
+    // },
+    // {
+    //     id: 'pack-8',
+    //     title: 'Mindful Living',
+    //     subtitle: 'Be present every day',
+    //     description: 'Small steps to slow down and enjoy the moment.',
+    //     image: require('../../../assets/images/habitLib3.png'),
+    //     habits: [
+    //         { id: 'h-26', title: '5-minute deep breathing', emoji: '🌬️' },
+    //         { id: 'h-27', title: 'Gratitude journaling', emoji: '🙏' },
+    //         { id: 'h-28', title: 'Eat one meal mindfully', emoji: '🥢' },
+    //     ],
+    // },
+    // {
+    //     id: 'pack-9',
+    //     title: 'Money Matters',
+    //     subtitle: 'Financial discipline',
+    //     description: 'Simple financial habits to build long-term security.',
+    //     image: require('../../../assets/images/habitLib2.png'),
+    //     habits: [
+    //         { id: 'h-29', title: 'Track daily expenses', emoji: '💸' },
+    //         { id: 'h-30', title: 'Save spare change', emoji: '🏦' },
+    //         { id: 'h-31', title: 'Review budget weekly', emoji: '📊' },
+    //     ],
+    // },
+    // {
+    //     id: 'pack-10',
+    //     title: 'Boost Productivity',
+    //     subtitle: 'Work smarter, not harder',
+    //     description: 'Habits to stay sharp and focused at work or study.',
+    //     image: require('../../../assets/images/habitLib1.png'),
+    //     habits: [
+    //         { id: 'h-32', title: 'Use a priority list', emoji: '🗂️' },
+    //         { id: 'h-33', title: 'Pomodoro technique (25/5)', emoji: '⏲️' },
+    //         { id: 'h-34', title: 'End the day with recap', emoji: '📋' },
+    //     ],
+    // },
+    // {
+    //     id: 'pack-11',
+    //     title: 'Creative Mindset',
+    //     subtitle: 'Spark inspiration daily',
+    //     description: 'Build habits that keep your creativity flowing.',
+    //     image: require('../../../assets/images/habitLib1.png'),
+    //     habits: [
+    //         { id: 'h-35', title: 'Sketch or doodle daily', emoji: '✏️' },
+    //         { id: 'h-36', title: 'Capture one new idea', emoji: '💡' },
+    //         { id: 'h-37', title: 'Listen to new music', emoji: '🎧' },
+    //     ],
+    // },
+    // {
+    //     id: 'pack-12',
+    //     title: 'Strong Relationships',
+    //     subtitle: 'Stay connected',
+    //     description: 'Simple habits to strengthen bonds with family and friends.',
+    //     image: require('../../../assets/images/habitLib2.png'),
+    //     habits: [
+    //         { id: 'h-38', title: 'Send a kind message', emoji: '💌' },
+    //         { id: 'h-39', title: 'Call a loved one', emoji: '📞' },
+    //         { id: 'h-40', title: 'Plan quality time', emoji: '👨‍👩‍👧‍👦' },
+    //     ],
+    // },
+    // {
+    //     id: 'pack-13',
+    //     title: 'Career Growth',
+    //     subtitle: 'Level up professionally',
+    //     description: 'Habits to grow skills and move your career forward.',
+    //     image: require('../../../assets/images/habitLib3.png'),
+    //     habits: [
+    //         { id: 'h-41', title: 'Read industry news', emoji: '📰' },
+    //         { id: 'h-42', title: 'Learn one new skill', emoji: '🛠️' },
+    //         { id: 'h-43', title: 'Update your LinkedIn', emoji: '💼' },
+    //     ],
+    // },
+    // {
+    //     id: 'pack-14',
+    //     title: 'Healthy Eating',
+    //     subtitle: 'Fuel your body right',
+    //     description: 'Nutrition habits to feel energized and balanced.',
+    //     image: require('../../../assets/images/habitLib4.png'),
+    //     habits: [
+    //         { id: 'h-44', title: 'Eat 5 servings of fruits & veggies', emoji: '🥦' },
+    //         { id: 'h-45', title: 'Limit added sugar', emoji: '🍬' },
+    //         { id: 'h-46', title: 'Cook one healthy meal', emoji: '🍲' },
+    //     ],
+    // },
+    // {
+    //     id: 'pack-15',
+    //     title: 'Student Success',
+    //     subtitle: 'Study smarter',
+    //     description: 'Habits for focus, learning, and academic success.',
+    //     image: require('../../../assets/images/habitLib5.png'),
+    //     habits: [
+    //         { id: 'h-47', title: 'Review notes daily', emoji: '📒' },
+    //         { id: 'h-48', title: 'Practice active recall', emoji: '🧠' },
+    //         { id: 'h-49', title: 'Stay consistent with schedule', emoji: '📅' },
+    //     ],
+    // },
+    // {
+    //     id: 'pack-16',
+    //     title: 'Self-Love Routine',
+    //     subtitle: 'Care for yourself',
+    //     description: 'Daily habits to nurture confidence and kindness to yourself.',
+    //     image: require('../../../assets/images/habitLib6.png'),
+    //     habits: [
+    //         { id: 'h-50', title: 'Positive affirmations', emoji: '🌸' },
+    //         { id: 'h-51', title: 'Treat yourself kindly', emoji: '🍫' },
+    //         { id: 'h-52', title: 'Reflect on wins of the day', emoji: '🏆' },
+    //     ],
+    // },
 ];
 
 export default function HabitLibrary() {
@@ -160,9 +281,9 @@ export default function HabitLibrary() {
 
             {/* Header */}
             <View style={{
-                paddingTop: 20,
+                paddingTop: 10,
                 paddingHorizontal: 24,
-                paddingBottom: 24,
+                paddingBottom: 14,
                 flexDirection: 'row',
                 alignItems: 'center',
                 backgroundColor: 'white',
@@ -181,14 +302,13 @@ export default function HabitLibrary() {
                         marginRight: 16
                     }}
                 >
-                    <Text style={{ fontSize: 20, color: '#6B7280' }}>←</Text>
+                    <Ionicons name="arrow-back-outline" size={20} color="#6B7280" />
                 </Pressable>
                 <View style={{ flex: 1 }}>
                     <Text style={{
                         fontFamily: 'Poppins_700Bold',
                         fontSize: 28,
                         color: '#111827',
-                        marginBottom: 4
                     }}>
                         Habit Library
                     </Text>
@@ -254,7 +374,7 @@ export default function HabitLibrary() {
                             <ImageBackground
                                 source={pack.image}
                                 resizeMode="cover"
-                                style={{ height: 180, justifyContent: 'flex-end' }}
+                                style={{ height: 300, justifyContent: 'flex-end' }}
                             >
                                 <View style={{
                                     padding: 16,
@@ -323,7 +443,7 @@ export default function HabitLibrary() {
                         <ImageBackground
                             source={selectedPack?.image}
                             resizeMode="cover"
-                            style={{ height: 360, paddingTop: 50, paddingHorizontal: 24, justifyContent: 'flex-end' }}
+                            style={{ height: 400, paddingHorizontal: 24, justifyContent: 'flex-end' }}
                         >
                             <Pressable onPress={handleClosePack} style={{
                                 position: 'absolute',
@@ -487,6 +607,6 @@ export default function HabitLibrary() {
                     </View>
                 </View>
             </Modal>
-        </SafeAreaView>
+        </SafeAreaView >
     );
 }

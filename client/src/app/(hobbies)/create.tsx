@@ -3,6 +3,7 @@ import { View, Text, Pressable, ScrollView, TextInput, StatusBar } from 'react-n
 // import { colors } from '../../components/ui';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons, AntDesign } from '@expo/vector-icons';
 
 const suggestions = [
     { id: '1', emoji: '👗', title: 'Organize wardrobe' },
@@ -10,7 +11,6 @@ const suggestions = [
     { id: '3', emoji: '💡', title: 'Mentor Someone' },
     { id: '4', emoji: '🛋️', title: 'Vacuum sofa' },
     { id: '5', emoji: '💖', title: 'Do a random act of kindness' },
-    { id: '6', emoji: '❤️', title: 'Donate to a Charity' }
 ];
 
 export default function CreatePlan() {
@@ -34,9 +34,9 @@ export default function CreatePlan() {
 
             {/* Header */}
             <View style={{
-                paddingTop: 20,
+                paddingTop: 10,
                 paddingHorizontal: 24,
-                paddingBottom: 24,
+                paddingBottom: 14,
                 flexDirection: 'row',
                 alignItems: 'center',
                 backgroundColor: 'white',
@@ -55,7 +55,7 @@ export default function CreatePlan() {
                         marginRight: 16
                     }}
                 >
-                    <Text style={{ fontSize: 20, color: '#6B7280' }}>←</Text>
+                    <Ionicons name="arrow-back-outline" size={20} color="#6B7280" />
                 </Pressable>
                 <View style={{ flex: 1 }}>
                     <Text style={{
@@ -81,7 +81,7 @@ export default function CreatePlan() {
                 <View style={{
                     backgroundColor: 'white',
                     borderRadius: 20,
-                    padding: 24,
+                    padding: 14,
                     marginTop: 20,
                     marginBottom: 32,
                     shadowColor: '#000',
@@ -137,8 +137,8 @@ export default function CreatePlan() {
                                     flexDirection: 'row',
                                     alignItems: 'center',
                                     backgroundColor: 'white',
-                                    borderRadius: 16,
-                                    padding: 20,
+                                    borderRadius: 50,
+                                    padding: 10,
                                     shadowColor: '#000',
                                     shadowOffset: { width: 0, height: 2 },
                                     shadowOpacity: 0.05,

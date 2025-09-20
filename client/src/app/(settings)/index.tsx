@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'expo-router';
 import { apiService } from '../../api/apiService';
 import { useToast } from '../../context/ToastContext';
+import { Ionicons, AntDesign } from '@expo/vector-icons';
 
 export default function Settings() {
     const { logout } = useAuth();
@@ -75,7 +76,7 @@ export default function Settings() {
             }}>
                 {title}
             </Text>
-            <Text style={{ fontSize: 18, color: '#9CA3AF' }}>›</Text>
+            <Ionicons name="chevron-forward-outline" size={20} color="#6B7280" />
         </Pressable>
     );
 
@@ -85,9 +86,9 @@ export default function Settings() {
 
             {/* Header */}
             <View style={{
-                paddingTop: 20,
+                paddingTop: 10,
                 paddingHorizontal: 24,
-                paddingBottom: 24,
+                paddingBottom: 14,
                 flexDirection: 'row',
                 alignItems: 'center',
                 backgroundColor: 'white',
@@ -106,14 +107,13 @@ export default function Settings() {
                         marginRight: 16
                     }}
                 >
-                    <Text style={{ fontSize: 20, color: '#6B7280' }}>←</Text>
+                    <Ionicons name="arrow-back-outline" size={20} color="#6B7280" />
                 </Pressable>
                 <View style={{ flex: 1 }}>
                     <Text style={{
                         fontFamily: 'Poppins_700Bold',
                         fontSize: 28,
                         color: '#111827',
-                        marginBottom: 4
                     }}>
                         Settings
                     </Text>
@@ -129,7 +129,7 @@ export default function Settings() {
 
             <ScrollView style={{ flex: 1, paddingHorizontal: 24 }}>
                 {/* Account Settings Section */}
-                <View style={{ marginTop: 20, marginBottom: 32 }}>
+                <View style={{ marginTop: 10, marginBottom: 12 }}>
                     <Text style={{
                         fontFamily: 'Poppins_700Bold',
                         fontSize: 18,

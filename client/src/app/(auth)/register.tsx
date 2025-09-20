@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Pressable, Text, TextInput, View, ActivityIndicator, ScrollView } from "react-native";
-import { ScreenContainer, Title, Button, Subtitle, colors } from "../../components/ui";
+import { Pressable, Text, View, ActivityIndicator, ScrollView, StatusBar } from "react-native";
+import { ScreenContainer, Title, Button, Subtitle, colors, SocialButton, Input } from "../../components/ui";
 import { useRouter } from "expo-router";
 import { useToast } from "../../context/ToastContext";
 import { useOnboarding } from "../../context/OnboardingContext";
@@ -10,6 +10,7 @@ import * as Google from "expo-auth-session/providers/google"
 import { makeRedirectUri } from "expo-auth-session"
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -126,173 +127,144 @@ export default function Register() {
     };
 
     return (
-        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
-            <ScreenContainer>
-                <View style={{ alignItems: 'center', marginBottom: 32 }}>
-                    <Text style={{ fontSize: 40, marginBottom: 8 }}>🌟</Text>
-                    <Title>Create Your Account</Title>
-                    <Subtitle>Join thousands of people building better habits</Subtitle>
-                </View>
-
-                <View style={{ gap: 16 }}>
-                    {/* Email Input */}
-                    <View>
-                        <Text style={{ fontFamily: 'Poppins_600SemiBold', fontSize: 16, marginBottom: 8, color: '#374151' }}>Email Address</Text>
-                        <TextInput
-                            value={email}
-                            onChangeText={setEmail}
-                            placeholder="Enter your email"
-                            autoCapitalize="none"
-                            keyboardType="email-address"
-                            style={{
-                                backgroundColor: colors.primary,
-                                borderRadius: 12,
-                                padding: 16,
-                                fontSize: 16,
-                                fontFamily: 'Poppins_400Regular',
-                                borderWidth: emailValid ? 2 : 0,
-                                borderColor: emailValid ? colors.mint : 'transparent'
-                            }}
-                        />
-                        {email.length > 0 && !emailValid && (
-                            <Text style={{ color: '#EF4444', fontSize: 14, marginTop: 4, fontFamily: 'Poppins_400Regular' }}>
-                                Please enter a valid email address
-                            </Text>
-                        )}
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#F8FAFC' }}>
+            <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
+            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
+                <View style={{ flex: 1, paddingHorizontal: 24, paddingTop: 40, paddingBottom: 24 }}>
+                    {/* Header */}
+                    <View style={{ alignItems: 'center', marginBottom: 40 }}>
+                        <View style={{
+                            width: 80,
+                            height: 80,
+                            borderRadius: 40,
+                            backgroundColor: colors.purple,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            marginBottom: 24,
+                            shadowColor: colors.purple,
+                            shadowOffset: { width: 0, height: 8 },
+                            shadowOpacity: 0.3,
+                            shadowRadius: 16,
+                            elevation: 8
+                        }}>
+                            <Text style={{ fontSize: 36 }}>🌟</Text>
+                        </View>
+                        <Title style={{ textAlign: 'center', marginBottom: 8 }}>Create Your Account</Title>
+                        <Subtitle style={{ textAlign: 'center', fontSize: 16 }}>Join thousands of people building better habits</Subtitle>
                     </View>
 
-                    {/* Password Input */}
-                    <View>
-                        <Text style={{ fontFamily: 'Poppins_600SemiBold', fontSize: 16, marginBottom: 8, color: '#374151' }}>Password</Text>
-                        <View style={{ position: 'relative' }}>
-                            <TextInput
+                    {/* Form */}
+                    <View style={{ gap: 20, marginBottom: 24 }}>
+                        {/* Email Input */}
+                        <View>
+                            <Text style={{ fontFamily: 'Poppins_600SemiBold', fontSize: 16, marginBottom: 8, color: '#374151' }}>
+                                Email Address
+                            </Text>
+                            <Input
+                                value={email}
+                                onChangeText={setEmail}
+                                placeholder="Enter your email"
+                                keyboardType="email-address"
+                                autoCapitalize="none"
+                                valid={emailValid}
+                                error={email.length > 0 && !emailValid ? "Please enter a valid email address" : undefined}
+                            />
+                        </View>
+
+                        {/* Password Input */}
+                        <View>
+                            <Text style={{ fontFamily: 'Poppins_600SemiBold', fontSize: 16, marginBottom: 8, color: '#374151' }}>
+                                Password
+                            </Text>
+                            <Input
                                 value={password}
                                 onChangeText={setPassword}
                                 placeholder="Create a strong password"
                                 secureTextEntry={!showPass}
-                                style={{
-                                    backgroundColor: colors.primary,
-                                    borderRadius: 12,
-                                    padding: 16,
-                                    paddingRight: 60,
-                                    fontSize: 16,
-                                    fontFamily: 'Poppins_400Regular',
-                                    borderWidth: passwordValid ? 2 : 0,
-                                    borderColor: passwordValid ? colors.mint : 'transparent'
-                                }}
+                                valid={passwordValid}
+                                error={password.length > 0 && !passwordValid ? "Password must be at least 6 characters" : undefined}
+                                showPasswordToggle={true}
+                                onTogglePassword={() => setShowPass(s => !s)}
                             />
-                            <Pressable
-                                onPress={() => setShowPass(s => !s)}
-                                style={{ position: 'absolute', right: 16, top: 16 }}
-                            >
-                                <Text style={{ color: colors.purple, fontFamily: 'Poppins_600SemiBold', fontSize: 14 }}>
-                                    {showPass ? 'Hide' : 'Show'}
-                                </Text>
-                            </Pressable>
                         </View>
-                        {password.length > 0 && !passwordValid && (
-                            <Text style={{ color: '#EF4444', fontSize: 14, marginTop: 4, fontFamily: 'Poppins_400Regular' }}>
-                                Password must be at least 6 characters
-                            </Text>
-                        )}
-                    </View>
 
-                    {/* Confirm Password Input */}
-                    <View>
-                        <Text style={{ fontFamily: 'Poppins_600SemiBold', fontSize: 16, marginBottom: 8, color: '#374151' }}>Confirm Password</Text>
-                        <View style={{ position: 'relative' }}>
-                            <TextInput
+                        {/* Confirm Password Input */}
+                        <View>
+                            <Text style={{ fontFamily: 'Poppins_600SemiBold', fontSize: 16, marginBottom: 8, color: '#374151' }}>
+                                Confirm Password
+                            </Text>
+                            <Input
                                 value={confirm}
                                 onChangeText={setConfirm}
                                 placeholder="Confirm your password"
                                 secureTextEntry={!showConfirmPass}
-                                style={{
-                                    backgroundColor: colors.primary,
-                                    borderRadius: 12,
-                                    padding: 16,
-                                    paddingRight: 60,
-                                    fontSize: 16,
-                                    fontFamily: 'Poppins_400Regular',
-                                    borderWidth: passwordsMatch ? 2 : 0,
-                                    borderColor: passwordsMatch ? colors.mint : 'transparent'
-                                }}
+                                valid={passwordsMatch}
+                                error={confirm.length > 0 && !passwordsMatch ? "Passwords do not match" : undefined}
+                                showPasswordToggle={true}
+                                onTogglePassword={() => setShowConfirmPass(s => !s)}
                             />
-                            <Pressable
-                                onPress={() => setShowConfirmPass(s => !s)}
-                                style={{ position: 'absolute', right: 16, top: 16 }}
-                            >
-                                <Text style={{ color: colors.purple, fontFamily: 'Poppins_600SemiBold', fontSize: 14 }}>
-                                    {showConfirmPass ? 'Hide' : 'Show'}
-                                </Text>
-                            </Pressable>
                         </View>
-                        {confirm.length > 0 && !passwordsMatch && (
-                            <Text style={{ color: '#EF4444', fontSize: 14, marginTop: 4, fontFamily: 'Poppins_400Regular' }}>
-                                Passwords do not match
-                            </Text>
+                    </View>
+
+                    {/* Create Account Button */}
+                    <Button onPress={onSubmit} disabled={!canSubmit}>
+                        {isLoading ? (
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                                <ActivityIndicator size="small" color="white" />
+                                <Text style={{ color: 'white', fontFamily: 'Poppins_600SemiBold', fontSize: 16 }}>
+                                    Creating Account...
+                                </Text>
+                            </View>
+                        ) : (
+                            'Create Account'
+                        )}
+                    </Button>
+
+                    {/* Divider */}
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 32 }}>
+                        <View style={{ flex: 1, height: 1, backgroundColor: '#E5E7EB' }} />
+                        <Text style={{ color: '#9CA3AF', fontFamily: 'Poppins_400Regular', marginHorizontal: 16 }}>
+                            or continue with
+                        </Text>
+                        <View style={{ flex: 1, height: 1, backgroundColor: '#E5E7EB' }} />
+                    </View>
+
+                    {/* Social Login Buttons */}
+                    <View style={{ gap: 12, marginBottom: 32 }}>
+                        <SocialButton
+                            variant="google"
+                            onPress={onGooglePress}
+                            disabled={isLoading || !request}
+                            loading={isLoading}
+                        >
+                            Continue with Google
+                        </SocialButton>
+
+                        {Platform.OS === 'ios' && (
+                            <SocialButton
+                                variant="apple"
+                                onPress={onApplePress}
+                                disabled={isLoading}
+                                loading={isLoading}
+                            >
+                                Continue with Apple
+                            </SocialButton>
                         )}
                     </View>
-                </View>
 
-                <View style={{ height: 24 }} />
-
-                <Button onPress={onSubmit} disabled={!canSubmit}>
-                    {isLoading ? (
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                            <ActivityIndicator size="small" color="white" />
-                            <Text style={{ color: 'white', fontFamily: 'Poppins_600SemiBold', fontSize: 16 }}>
-                                Creating Account...
-                            </Text>
-                        </View>
-                    ) : (
-                        'Create Account'
-                    )}
-                </Button>
-
-                <View style={{ marginVertical: 16, alignItems: 'center' }}>
-                    <Text style={{ color: '#9CA3AF', fontFamily: 'Poppins_400Regular' }}>or</Text>
-                </View>
-
-                <Button onPress={onGooglePress} disabled={isLoading || !request}>
-                    {isLoading ? (
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                            <ActivityIndicator size="small" color="white" />
-                            <Text style={{ color: 'white', fontFamily: 'Poppins_600SemiBold', fontSize: 16 }}>
-                                Connecting Google...
-                            </Text>
-                        </View>
-                    ) : (
-                        'Continue with Google'
-                    )}
-                </Button>
-
-                {Platform.OS === 'ios' && (
-                    <>
-                        <View style={{ marginVertical: 16, alignItems: 'center' }}>
-                            <Text style={{ color: '#9CA3AF', fontFamily: 'Poppins_400Regular' }}>or</Text>
-                        </View>
-
-                        <AppleAuthentication.AppleAuthenticationButton
-                            buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
-                            buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
-                            cornerRadius={12}
-                            style={{ width: '100%', height: 50 }}
-                            onPress={onApplePress}
-                        />
-                    </>
-                )}
-
-                <View style={{ marginTop: 24, alignItems: 'center' }}>
-                    <Text style={{ color: '#6B7280', fontSize: 14, fontFamily: 'Poppins_400Regular', marginBottom: 8 }}>
-                        Already have an account?
-                    </Text>
-                    <Pressable onPress={() => router.replace("/(auth)/login")}>
-                        <Text style={{ color: colors.purple, fontFamily: 'Poppins_600SemiBold', fontSize: 16 }}>
-                            Sign In Instead
+                    {/* Sign In Link */}
+                    <View style={{ alignItems: 'center' }}>
+                        <Text style={{ color: '#6B7280', fontSize: 14, fontFamily: 'Poppins_400Regular', marginBottom: 8 }}>
+                            Already have an account?
                         </Text>
-                    </Pressable>
+                        <Pressable onPress={() => router.replace("/(auth)/login")}>
+                            <Text style={{ color: colors.purple, fontFamily: 'Poppins_600SemiBold', fontSize: 16 }}>
+                                Sign In Instead
+                            </Text>
+                        </Pressable>
+                    </View>
                 </View>
-            </ScreenContainer>
-        </ScrollView>
+            </ScrollView>
+        </SafeAreaView>
     );
 }

@@ -85,7 +85,7 @@ export default function index() {
       } else {
         router.replace("/(onboarding)/age");
       }
-    }, 4000);
+    }, 2000);
 
     return () => {
       clearTimeout(t);
@@ -174,7 +174,6 @@ export default function index() {
                     shadowOffset: { width: 0, height: 8 },
                     shadowOpacity: 0.3,
                     shadowRadius: 16,
-                    elevation: 16
                   }}
                 />
               </Animated.View>

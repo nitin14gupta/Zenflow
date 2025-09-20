@@ -155,58 +155,132 @@ export default function HabitLibrary() {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: '#F0F9FF' }}>
-            <StatusBar barStyle="dark-content" backgroundColor="#F0F9FF" />
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#F8FAFC' }}>
+            <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
 
             {/* Header */}
             <View style={{
-                paddingTop: 10,
-                paddingHorizontal: 20,
-                paddingBottom: 20,
+                paddingTop: 20,
+                paddingHorizontal: 24,
+                paddingBottom: 24,
                 flexDirection: 'row',
-                alignItems: 'center'
+                alignItems: 'center',
+                backgroundColor: 'white',
+                borderBottomWidth: 1,
+                borderBottomColor: '#E5E7EB'
             }}>
                 <Pressable
                     onPress={() => router.back()}
                     style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 20,
-                        backgroundColor: 'white',
+                        width: 44,
+                        height: 44,
+                        borderRadius: 22,
+                        backgroundColor: '#F3F4F6',
                         alignItems: 'center',
                         justifyContent: 'center',
                         marginRight: 16
                     }}
                 >
-                    <Text style={{ fontSize: 18, color: '#6B7280' }}>✕</Text>
+                    <Text style={{ fontSize: 20, color: '#6B7280' }}>←</Text>
                 </Pressable>
-                <Text style={{
-                    fontFamily: 'Poppins_700Bold',
-                    fontSize: 24,
-                    color: '#111827',
-                    flex: 1
-                }}>
-                    Habit Library
-                </Text>
+                <View style={{ flex: 1 }}>
+                    <Text style={{
+                        fontFamily: 'Poppins_700Bold',
+                        fontSize: 28,
+                        color: '#111827',
+                        marginBottom: 4
+                    }}>
+                        Habit Library
+                    </Text>
+                    <Text style={{
+                        fontFamily: 'Poppins_400Regular',
+                        fontSize: 14,
+                        color: '#6B7280'
+                    }}>
+                        Choose from 100+ pre-made habits
+                    </Text>
+                </View>
             </View>
 
-            <ScrollView style={{ flex: 1, paddingHorizontal: 20 }}>
+            <ScrollView style={{ flex: 1, paddingHorizontal: 24 }}>
+                {/* Stats Section */}
+                <View style={{
+                    backgroundColor: 'white',
+                    borderRadius: 20,
+                    padding: 20,
+                    marginTop: 20,
+                    marginBottom: 24,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 8,
+                    elevation: 4
+                }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+                        <View style={{ alignItems: 'center' }}>
+                            <Text style={{ fontFamily: 'Poppins_700Bold', fontSize: 24, color: '#111827' }}>6</Text>
+                            <Text style={{ fontFamily: 'Poppins_400Regular', fontSize: 12, color: '#6B7280' }}>Packs</Text>
+                        </View>
+                        <View style={{ alignItems: 'center' }}>
+                            <Text style={{ fontFamily: 'Poppins_700Bold', fontSize: 24, color: '#111827' }}>22</Text>
+                            <Text style={{ fontFamily: 'Poppins_400Regular', fontSize: 12, color: '#6B7280' }}>Habits</Text>
+                        </View>
+                        <View style={{ alignItems: 'center' }}>
+                            <Text style={{ fontFamily: 'Poppins_700Bold', fontSize: 24, color: '#111827' }}>100+</Text>
+                            <Text style={{ fontFamily: 'Poppins_400Regular', fontSize: 12, color: '#6B7280' }}>Total</Text>
+                        </View>
+                    </View>
+                </View>
+
                 {/* Card grid */}
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-                    {habitPacks.map((pack) => (
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginBottom: 24 }}>
+                    {habitPacks.map((pack, index) => (
                         <Pressable
                             key={pack.id}
                             onPress={() => handleOpenPack(pack)}
-                            style={{ width: '48%', borderRadius: 16, overflow: 'hidden', backgroundColor: 'white', marginBottom: 16 }}
+                            style={{
+                                width: '48%',
+                                borderRadius: 20,
+                                overflow: 'hidden',
+                                backgroundColor: 'white',
+                                marginBottom: 16,
+                                shadowColor: '#000',
+                                shadowOffset: { width: 0, height: 4 },
+                                shadowOpacity: 0.1,
+                                shadowRadius: 8,
+                                elevation: 4
+                            }}
                         >
                             <ImageBackground
                                 source={pack.image}
                                 resizeMode="cover"
-                                style={{ height: 200, justifyContent: 'flex-end' }}
+                                style={{ height: 180, justifyContent: 'flex-end' }}
                             >
-                                <View style={{ padding: 12 }}>
-                                    <Text style={{ color: 'white', fontFamily: 'Poppins_700Bold', fontSize: 18 }}>{pack.title}</Text>
-                                    <Text style={{ color: 'white', fontFamily: 'Poppins_400Regular', fontSize: 12 }}>{pack.subtitle}</Text>
+                                <View style={{
+                                    padding: 16,
+                                    backgroundColor: 'rgba(0,0,0,0.3)',
+                                    borderBottomLeftRadius: 20,
+                                    borderBottomRightRadius: 20
+                                }}>
+                                    <Text style={{ color: 'white', fontFamily: 'Poppins_700Bold', fontSize: 16, marginBottom: 4 }}>
+                                        {pack.title}
+                                    </Text>
+                                    <Text style={{ color: 'white', fontFamily: 'Poppins_400Regular', fontSize: 12, opacity: 0.9 }}>
+                                        {pack.subtitle}
+                                    </Text>
+                                    <View style={{
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        marginTop: 8
+                                    }}>
+                                        <Text style={{ color: 'white', fontFamily: 'Poppins_600SemiBold', fontSize: 12 }}>
+                                            {pack.habits.length} habits
+                                        </Text>
+                                        <Text style={{ color: 'white', marginHorizontal: 8 }}>•</Text>
+                                        <Text style={{ color: 'white', fontFamily: 'Poppins_400Regular', fontSize: 12 }}>
+                                            Daily
+                                        </Text>
+                                    </View>
                                 </View>
                             </ImageBackground>
                         </Pressable>
@@ -218,20 +292,26 @@ export default function HabitLibrary() {
                     onPress={() => router.push('/(hobbies)/create')}
                     style={{
                         backgroundColor: 'white',
-                        borderRadius: 16,
-                        paddingVertical: 18,
-                        paddingHorizontal: 16,
+                        borderRadius: 20,
+                        paddingVertical: 20,
+                        paddingHorizontal: 24,
                         alignItems: 'center',
-                        marginTop: 12,
-                        marginBottom: 28,
+                        marginBottom: 32,
                         shadowColor: '#000',
-                        shadowOffset: { width: 0, height: 1 },
-                        shadowOpacity: 0.05,
-                        shadowRadius: 2,
-                        elevation: 2
+                        shadowOffset: { width: 0, height: 4 },
+                        shadowOpacity: 0.1,
+                        shadowRadius: 8,
+                        elevation: 4,
+                        borderWidth: 2,
+                        borderColor: '#F3F4F6'
                     }}
                 >
-                    <Text style={{ fontFamily: 'Poppins_600SemiBold', fontSize: 16, color: '#111827' }}>Browse all habits →</Text>
+                    <Text style={{ fontFamily: 'Poppins_600SemiBold', fontSize: 16, color: '#111827', marginBottom: 4 }}>
+                        Create Custom Habit
+                    </Text>
+                    <Text style={{ fontFamily: 'Poppins_400Regular', fontSize: 14, color: '#6B7280' }}>
+                        Build your own personalized routine
+                    </Text>
                 </Pressable>
             </ScrollView>
 
@@ -243,27 +323,105 @@ export default function HabitLibrary() {
                         <ImageBackground
                             source={selectedPack?.image}
                             resizeMode="cover"
-                            style={{ height: 320, paddingTop: 40, paddingHorizontal: 20, justifyContent: 'flex-end' }}
+                            style={{ height: 360, paddingTop: 50, paddingHorizontal: 24, justifyContent: 'flex-end' }}
                         >
-                            <Pressable onPress={handleClosePack} style={{ position: 'absolute', top: 40, left: 20, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.9)', alignItems: 'center', justifyContent: 'center' }}>
-                                <Text style={{ fontSize: 18, color: '#374151' }}>✕</Text>
+                            <Pressable onPress={handleClosePack} style={{
+                                position: 'absolute',
+                                top: 50,
+                                left: 24,
+                                width: 44,
+                                height: 44,
+                                borderRadius: 22,
+                                backgroundColor: 'rgba(255,255,255,0.9)',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                shadowColor: '#000',
+                                shadowOffset: { width: 0, height: 2 },
+                                shadowOpacity: 0.1,
+                                shadowRadius: 4,
+                                elevation: 4
+                            }}>
+                                <Text style={{ fontSize: 20, color: '#374151' }}>✕</Text>
                             </Pressable>
-                            <Text style={{ color: 'white', fontFamily: 'Poppins_700Bold', fontSize: 32 }}>{selectedPack?.title}</Text>
-                            <Text style={{ color: 'white', fontFamily: 'Poppins_400Regular', fontSize: 16, marginBottom: 12 }}>{selectedPack?.subtitle}</Text>
-                            <Pressable
-                                disabled={isAddingAll}
-                                onPress={handleAddAllHabits}
-                                style={{ backgroundColor: 'white', borderRadius: 24, paddingVertical: 12, alignItems: 'center', marginBottom: 16 }}
-                            >
-                                <Text style={{ fontFamily: 'Poppins_600SemiBold', fontSize: 16, color: '#111827' }}>{isAddingAll ? 'Adding...' : ((user as any)?.is_premium ? 'Add all habits' : 'Unlock with Premium')}</Text>
-                            </Pressable>
-                            <Text style={{ color: 'white', fontFamily: 'Poppins_400Regular', fontSize: 12, marginBottom: 12, opacity: 0.9 }}>{selectedPack?.description}</Text>
+
+                            <View style={{ marginBottom: 20 }}>
+                                <Text style={{ color: 'white', fontFamily: 'Poppins_700Bold', fontSize: 32, marginBottom: 8 }}>
+                                    {selectedPack?.title}
+                                </Text>
+                                <Text style={{ color: 'white', fontFamily: 'Poppins_400Regular', fontSize: 16, marginBottom: 16, opacity: 0.9 }}>
+                                    {selectedPack?.subtitle}
+                                </Text>
+
+                                <View style={{
+                                    backgroundColor: 'rgba(255,255,255,0.2)',
+                                    borderRadius: 16,
+                                    padding: 16,
+                                    marginBottom: 16,
+                                    backdropFilter: 'blur(10px)'
+                                }}>
+                                    <Text style={{ color: 'white', fontFamily: 'Poppins_400Regular', fontSize: 14, lineHeight: 20 }}>
+                                        {selectedPack?.description}
+                                    </Text>
+                                </View>
+
+                                <Pressable
+                                    disabled={isAddingAll}
+                                    onPress={handleAddAllHabits}
+                                    style={{
+                                        backgroundColor: 'white',
+                                        borderRadius: 16,
+                                        paddingVertical: 16,
+                                        alignItems: 'center',
+                                        shadowColor: '#000',
+                                        shadowOffset: { width: 0, height: 4 },
+                                        shadowOpacity: 0.2,
+                                        shadowRadius: 8,
+                                        elevation: 4
+                                    }}
+                                >
+                                    <Text style={{
+                                        fontFamily: 'Poppins_600SemiBold',
+                                        fontSize: 16,
+                                        color: '#111827'
+                                    }}>
+                                        {isAddingAll ? 'Adding...' : ((user as any)?.is_premium ? 'Add All Habits' : 'Unlock with Premium')}
+                                    </Text>
+                                </Pressable>
+                            </View>
                         </ImageBackground>
 
                         {/* Habits list */}
-                        <ScrollView style={{ flex: 1, paddingHorizontal: 20, paddingTop: 16 }}>
-                            <Text style={{ fontFamily: 'Poppins_700Bold', fontSize: 18, color: '#111827', marginBottom: 12 }}>Daily</Text>
-                            {selectedPack?.habits.map((habit) => (
+                        <ScrollView style={{ flex: 1, paddingHorizontal: 24, paddingTop: 24 }}>
+                            <View style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                marginBottom: 20
+                            }}>
+                                <Text style={{
+                                    fontFamily: 'Poppins_700Bold',
+                                    fontSize: 20,
+                                    color: '#111827',
+                                    flex: 1
+                                }}>
+                                    Daily Habits
+                                </Text>
+                                <View style={{
+                                    backgroundColor: '#F3F4F6',
+                                    borderRadius: 12,
+                                    paddingHorizontal: 12,
+                                    paddingVertical: 6
+                                }}>
+                                    <Text style={{
+                                        fontFamily: 'Poppins_600SemiBold',
+                                        fontSize: 12,
+                                        color: '#6B7280'
+                                    }}>
+                                        {selectedPack?.habits.length} habits
+                                    </Text>
+                                </View>
+                            </View>
+
+                            {selectedPack?.habits.map((habit, index) => (
                                 <Pressable
                                     key={habit.id}
                                     onPress={() => handleHabitSelect(habit)}
@@ -271,28 +429,60 @@ export default function HabitLibrary() {
                                         flexDirection: 'row',
                                         alignItems: 'center',
                                         backgroundColor: 'white',
-                                        borderRadius: 24,
+                                        borderRadius: 16,
                                         paddingVertical: 16,
                                         paddingHorizontal: 16,
                                         marginBottom: 12,
                                         shadowColor: '#000',
-                                        shadowOffset: { width: 0, height: 1 },
+                                        shadowOffset: { width: 0, height: 2 },
                                         shadowOpacity: 0.05,
-                                        shadowRadius: 2,
-                                        elevation: 1
+                                        shadowRadius: 4,
+                                        elevation: 2,
+                                        borderWidth: 1,
+                                        borderColor: '#F3F4F6'
                                     }}
                                 >
-                                    <Text style={{ fontSize: 22, marginRight: 12 }}>{habit.emoji || '🌟'}</Text>
-                                    <View style={{ flex: 1 }}>
-                                        <Text style={{ fontFamily: 'Poppins_600SemiBold', fontSize: 16, color: '#111827' }}>{habit.title}</Text>
-                                        <Text style={{ fontFamily: 'Poppins_400Regular', fontSize: 12, color: '#6B7280' }}>Repeats Daily</Text>
+                                    <View style={{
+                                        width: 48,
+                                        height: 48,
+                                        borderRadius: 24,
+                                        backgroundColor: '#F8FAFC',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        marginRight: 16
+                                    }}>
+                                        <Text style={{ fontSize: 24 }}>{habit.emoji || '🌟'}</Text>
                                     </View>
-                                    <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: '#F3F4F6', alignItems: 'center', justifyContent: 'center' }}>
+                                    <View style={{ flex: 1 }}>
+                                        <Text style={{
+                                            fontFamily: 'Poppins_600SemiBold',
+                                            fontSize: 16,
+                                            color: '#111827',
+                                            marginBottom: 4
+                                        }}>
+                                            {habit.title}
+                                        </Text>
+                                        <Text style={{
+                                            fontFamily: 'Poppins_400Regular',
+                                            fontSize: 12,
+                                            color: '#6B7280'
+                                        }}>
+                                            Repeats Daily • {habit.duration || '1h'}
+                                        </Text>
+                                    </View>
+                                    <View style={{
+                                        width: 36,
+                                        height: 36,
+                                        borderRadius: 18,
+                                        backgroundColor: '#F3F4F6',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                    }}>
                                         <Text style={{ fontSize: 18, color: '#6B7280' }}>+</Text>
                                     </View>
                                 </Pressable>
                             ))}
-                            <View style={{ height: 32 }} />
+                            <View style={{ height: 40 }} />
                         </ScrollView>
                     </View>
                 </View>

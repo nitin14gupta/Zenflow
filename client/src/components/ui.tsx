@@ -104,3 +104,178 @@ export const formatTimeTo12h = (time?: string): string => {
     return `${hour}:${minute.padStart(2, "0")} ${ampm}`;
 };
 
+// Social Login Button Component
+type SocialButtonProps = PropsWithChildren<{
+    onPress?: () => void;
+    disabled?: boolean;
+    variant?: "google" | "apple";
+    loading?: boolean;
+}>;
+
+export const SocialButton: React.FC<SocialButtonProps> = ({
+    children,
+    onPress,
+    disabled,
+    variant = "google",
+    loading = false
+}) => {
+    const scale = useRef(new Animated.Value(1)).current;
+
+    const getButtonStyle = () => {
+        switch (variant) {
+            case "google":
+                return {
+                    backgroundColor: "#FFFFFF",
+                    borderWidth: 1,
+                    borderColor: "#D1D5DB",
+                };
+            case "apple":
+                return {
+                    backgroundColor: "#000000",
+                };
+            default:
+                return {
+                    backgroundColor: "#FFFFFF",
+                    borderWidth: 1,
+                    borderColor: "#D1D5DB",
+                };
+        }
+    };
+
+    const getTextColor = () => {
+        return variant === "apple" ? "#FFFFFF" : "#374151";
+    };
+
+    const getIcon = () => {
+        if (loading) return "⏳";
+        switch (variant) {
+            case "google":
+                return "🔍"; // Google icon placeholder
+            case "apple":
+                return "🍎"; // Apple icon placeholder
+            default:
+                return "🔍";
+        }
+    };
+
+    return (
+        <Pressable
+            onPressIn={() => Animated.spring(scale, { toValue: 0.98, useNativeDriver: true }).start()}
+            onPressOut={() => Animated.spring(scale, { toValue: 1, friction: 3, useNativeDriver: true }).start()}
+            onPress={onPress}
+            disabled={disabled || loading}
+        >
+            <Animated.View style={[
+                {
+                    transform: [{ scale }],
+                    paddingVertical: 14,
+                    paddingHorizontal: 16,
+                    borderRadius: 12,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    shadowOpacity: 0.1,
+                    shadowRadius: 4,
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 2 },
+                    opacity: disabled || loading ? 0.6 : 1
+                },
+                getButtonStyle()
+            ]}>
+                <Text style={{ fontSize: 18, marginRight: 12 }}>{getIcon()}</Text>
+                <Text style={{
+                    color: getTextColor(),
+                    textAlign: "center",
+                    fontFamily: "Poppins_600SemiBold",
+                    fontSize: 16
+                }}>
+                    {children}
+                </Text>
+            </Animated.View>
+        </Pressable>
+    );
+};
+
+// Enhanced Input Component
+type InputProps = {
+    value: string;
+    onChangeText: (text: string) => void;
+    placeholder?: string;
+    secureTextEntry?: boolean;
+    keyboardType?: "default" | "email-address" | "number-pad" | "numbers-and-punctuation";
+    autoCapitalize?: "none" | "sentences" | "words" | "characters";
+    maxLength?: number;
+    error?: string;
+    valid?: boolean;
+    showPasswordToggle?: boolean;
+    onTogglePassword?: () => void;
+    style?: any;
+};
+
+export const Input: React.FC<InputProps> = ({
+    value,
+    onChangeText,
+    placeholder,
+    secureTextEntry = false,
+    keyboardType = "default",
+    autoCapitalize = "sentences",
+    maxLength,
+    error,
+    valid,
+    showPasswordToggle = false,
+    onTogglePassword,
+    style
+}) => {
+    return (
+        <View style={style}>
+            <View style={{
+                backgroundColor: colors.primary,
+                borderRadius: 12,
+                padding: 16,
+                borderWidth: valid ? 2 : (error ? 2 : 0),
+                borderColor: valid ? colors.mint : (error ? '#EF4444' : 'transparent'),
+                flexDirection: 'row',
+                alignItems: 'center'
+            }}>
+                <TextInput
+                    value={value}
+                    onChangeText={onChangeText}
+                    placeholder={placeholder}
+                    placeholderTextColor="#9CA3AF"
+                    secureTextEntry={secureTextEntry}
+                    keyboardType={keyboardType}
+                    autoCapitalize={autoCapitalize}
+                    maxLength={maxLength}
+                    style={{
+                        flex: 1,
+                        fontSize: 16,
+                        fontFamily: 'Poppins_400Regular',
+                        color: '#111827'
+                    }}
+                />
+                {showPasswordToggle && (
+                    <Pressable onPress={onTogglePassword} style={{ padding: 4 }}>
+                        <Text style={{
+                            color: colors.purple,
+                            fontFamily: 'Poppins_600SemiBold',
+                            fontSize: 14
+                        }}>
+                            {secureTextEntry ? 'Show' : 'Hide'}
+                        </Text>
+                    </Pressable>
+                )}
+            </View>
+            {error && (
+                <Text style={{
+                    color: '#EF4444',
+                    fontSize: 14,
+                    marginTop: 4,
+                    fontFamily: 'Poppins_400Regular'
+                }}>
+                    {error}
+                </Text>
+            )}
+        </View>
+    );
+};
+

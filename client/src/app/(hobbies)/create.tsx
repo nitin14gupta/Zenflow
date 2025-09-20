@@ -29,31 +29,51 @@ export default function CreatePlan() {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: '#F0F9FF' }}>
-            <StatusBar barStyle="dark-content" backgroundColor="#F0F9FF" />
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#F8FAFC' }}>
+            <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
 
             {/* Header */}
             <View style={{
-                paddingTop: 10,
-                paddingHorizontal: 20,
-                paddingBottom: 20,
+                paddingTop: 20,
+                paddingHorizontal: 24,
+                paddingBottom: 24,
                 flexDirection: 'row',
-                alignItems: 'center'
+                alignItems: 'center',
+                backgroundColor: 'white',
+                borderBottomWidth: 1,
+                borderBottomColor: '#E5E7EB'
             }}>
                 <Pressable
                     onPress={() => router.back()}
                     style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 20,
-                        backgroundColor: 'white',
+                        width: 44,
+                        height: 44,
+                        borderRadius: 22,
+                        backgroundColor: '#F3F4F6',
                         alignItems: 'center',
                         justifyContent: 'center',
                         marginRight: 16
                     }}
                 >
-                    <Text style={{ fontSize: 18, color: '#6B7280' }}>✕</Text>
+                    <Text style={{ fontSize: 20, color: '#6B7280' }}>←</Text>
                 </Pressable>
+                <View style={{ flex: 1 }}>
+                    <Text style={{
+                        fontFamily: 'Poppins_700Bold',
+                        fontSize: 28,
+                        color: '#111827',
+                        marginBottom: 4
+                    }}>
+                        Create Habit
+                    </Text>
+                    <Text style={{
+                        fontFamily: 'Poppins_400Regular',
+                        fontSize: 14,
+                        color: '#6B7280'
+                    }}>
+                        Build your personalized routine
+                    </Text>
+                </View>
             </View>
 
             <ScrollView style={{ flex: 1, paddingHorizontal: 20 }}>

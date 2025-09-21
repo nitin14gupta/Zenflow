@@ -141,9 +141,13 @@ export default function Forgot() {
 
                     {step === 2 && (
                         <View style={{ marginTop: 16, alignItems: 'center' }}>
-                            <Pressable onPress={onSubmit}>
-                                <Text style={{ color: colors.purple, fontFamily: 'Poppins_600SemiBold', fontSize: 14 }}>
-                                    Resend Code
+                            <Pressable onPress={onSubmit} disabled={isLoading}>
+                                <Text style={{
+                                    color: isLoading ? '#9CA3AF' : colors.purple,
+                                    fontFamily: 'Poppins_600SemiBold',
+                                    fontSize: 14
+                                }}>
+                                    {isLoading ? 'Sending...' : 'Resend Code'}
                                 </Text>
                             </Pressable>
                         </View>

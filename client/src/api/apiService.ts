@@ -170,7 +170,7 @@ class ApiService {
     async resetPasswordWithCode(email: string, code: string, password: string): Promise<ApiResponse> {
         return this.makeRequest(API_CONFIG.ENDPOINTS.AUTH.RESET_PASSWORD, {
             method: 'POST',
-            body: JSON.stringify({ email, code, password }),
+            body: JSON.stringify({ email, code, new_password: password }),
         });
     }
 

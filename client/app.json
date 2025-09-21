@@ -71,10 +71,7 @@
     "extra": {
       "router": {},
       "env": {
-        "EXPO_PUBLIC_API_BASE_URL": "http://192.168.0.103:5000"
-      },
-      "eas": {
-        "projectId": "24df0037-4696-4d4d-b649-7dd2b750240b"
+        "EXPO_PUBLIC_API_BASE_URL": "http://192.168.0.104:5000"
       }
     }
   }

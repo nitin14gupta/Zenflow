@@ -257,15 +257,17 @@ class ApiService {
         });
     }
 
-    async togglePlanCompletion(planId: string): Promise<ApiResponse> {
+    async togglePlanCompletion(planId: string, date?: string): Promise<ApiResponse> {
         return this.makeRequest(`/api/plans/${planId}/complete`, {
             method: 'PUT',
+            body: date ? JSON.stringify({ date }) : undefined,
         });
     }
 
-    async skipPlan(planId: string): Promise<ApiResponse> {
+    async skipPlan(planId: string, date?: string): Promise<ApiResponse> {
         return this.makeRequest(`/api/plans/${planId}/skip`, {
             method: 'PUT',
+            body: date ? JSON.stringify({ date }) : undefined,
         });
     }
 

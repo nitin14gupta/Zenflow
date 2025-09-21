@@ -141,6 +141,33 @@ CREATE TABLE push_tokens (
                 )
                 return
 
+            # Plan instances table for tracking daily completions
+            try:
+                self.supabase.table('plan_instances').select('id').limit(1).execute()
+                print("✅ Plan instances table already exists")
+            except Exception:
+                print("❌ Plan instances table doesn't exist - please create it manually in Supabase dashboard")
+                print("""
+                Please run this SQL in your Supabase SQL Editor:
+                
+                CREATE TABLE plan_instances (
+                    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+                    plan_id UUID REFERENCES daily_plans(id) ON DELETE CASCADE,
+                    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+                    instance_date DATE NOT NULL,
+                    is_completed BOOLEAN DEFAULT FALSE,
+                    is_skipped BOOLEAN DEFAULT FALSE,
+                    completed_at TIMESTAMP WITH TIME ZONE,
+                    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+                    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+                    UNIQUE(plan_id, instance_date)
+                );
+                
+                CREATE INDEX idx_plan_instances_plan_date ON plan_instances(plan_id, instance_date);
+                CREATE INDEX idx_plan_instances_user_date ON plan_instances(user_id, instance_date);
+                """)
+                return
+
             # Optional: push event logs table (to help debug and avoid spam)
             try:
                 self.supabase.table('push_events').select('id').limit(1).execute()

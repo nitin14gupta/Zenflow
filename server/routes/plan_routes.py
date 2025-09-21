@@ -76,9 +76,19 @@ def get_user_plans(user_id):
         # Get plans for user
         result = db_config.supabase.table('daily_plans').select('*').eq('user_id', user_id).order('scheduled_date', desc=False).execute()
         
+        # Get plan instances for recurring plans
+        plans = result.data or []
+        for plan in plans:
+            if plan.get('repeat_type') in ['daily', 'weekly', 'biweekly', 'monthly', 'weekdays', 'weekends']:
+                # Get instances for this plan
+                instances_result = db_config.supabase.table('plan_instances').select('*').eq('plan_id', plan['id']).execute()
+                plan['instances'] = instances_result.data or []
+            else:
+                plan['instances'] = []
+        
         return jsonify({
             'success': True,
-            'plans': result.data
+            'plans': plans
         }), 200
         
     except Exception as e:
@@ -181,27 +191,73 @@ def toggle_plan_completion(plan_id):
         if not user_data:
             return jsonify({'error': 'Invalid token'}), 401
         
-        # Get current plan
-        result = db_config.supabase.table('daily_plans').select('is_completed').eq('id', plan_id).eq('user_id', user_data.get('user_id')).execute()
+        user_id = user_data.get('user_id')
         
-        if not result.data:
+        # Get plan details
+        plan_result = db_config.supabase.table('daily_plans').select('*').eq('id', plan_id).eq('user_id', user_id).execute()
+        
+        if not plan_result.data:
             return jsonify({'error': 'Plan not found'}), 404
         
-        # Toggle completion status
-        new_status = not result.data[0]['is_completed']
-        update_result = db_config.supabase.table('daily_plans').update({
-            'is_completed': new_status,
-            'updated_at': datetime.utcnow().isoformat()
-        }).eq('id', plan_id).eq('user_id', user_data.get('user_id')).execute()
+        plan = plan_result.data[0]
         
-        if update_result.data:
-            return jsonify({
-                'success': True,
-                'message': f'Plan marked as {"completed" if new_status else "incomplete"}',
-                'is_completed': new_status
-            }), 200
+        # Get the date from request body or use today
+        data = request.get_json() or {}
+        target_date = data.get('date', datetime.utcnow().date().isoformat())
+        
+        # Check if this is a recurring plan
+        if plan.get('repeat_type') in ['daily', 'weekly', 'biweekly', 'monthly', 'weekdays', 'weekends']:
+            # For recurring plans, create/update plan instance
+            instance_data = {
+                'plan_id': plan_id,
+                'user_id': user_id,
+                'instance_date': target_date,
+                'is_completed': True,
+                'is_skipped': False,
+                'completed_at': datetime.utcnow().isoformat(),
+                'updated_at': datetime.utcnow().isoformat()
+            }
+            
+            # Check if instance already exists
+            existing_instance = db_config.supabase.table('plan_instances').select('*').eq('plan_id', plan_id).eq('instance_date', target_date).execute()
+            
+            if existing_instance.data:
+                # Update existing instance
+                update_result = db_config.supabase.table('plan_instances').update({
+                    'is_completed': True,
+                    'is_skipped': False,
+                    'completed_at': datetime.utcnow().isoformat(),
+                    'updated_at': datetime.utcnow().isoformat()
+                }).eq('id', existing_instance.data[0]['id']).execute()
+            else:
+                # Create new instance
+                update_result = db_config.supabase.table('plan_instances').insert(instance_data).execute()
+            
+            if update_result.data:
+                return jsonify({
+                    'success': True,
+                    'message': 'Plan instance marked as completed',
+                    'is_completed': True,
+                    'instance_date': target_date
+                }), 200
+            else:
+                return jsonify({'error': 'Failed to update plan instance'}), 500
         else:
-            return jsonify({'error': 'Failed to update plan'}), 500
+            # For one-time plans, update the plan directly
+            new_status = not plan.get('is_completed', False)
+            update_result = db_config.supabase.table('daily_plans').update({
+                'is_completed': new_status,
+                'updated_at': datetime.utcnow().isoformat()
+            }).eq('id', plan_id).eq('user_id', user_id).execute()
+            
+            if update_result.data:
+                return jsonify({
+                    'success': True,
+                    'message': f'Plan marked as {"completed" if new_status else "incomplete"}',
+                    'is_completed': new_status
+                }), 200
+            else:
+                return jsonify({'error': 'Failed to update plan'}), 500
             
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -219,31 +275,75 @@ def skip_plan(plan_id):
         if not user_data:
             return jsonify({'error': 'Invalid token'}), 401
         
-        # Get current plan
-        result = db_config.supabase.table('daily_plans').select('is_completed, is_skipped').eq('id', plan_id).eq('user_id', user_data.get('user_id')).execute()
+        user_id = user_data.get('user_id')
         
-        if not result.data:
+        # Get plan details
+        plan_result = db_config.supabase.table('daily_plans').select('*').eq('id', plan_id).eq('user_id', user_id).execute()
+        
+        if not plan_result.data:
             return jsonify({'error': 'Plan not found'}), 404
         
-        # Check if plan is completed
-        if result.data[0]['is_completed']:
-            return jsonify({'error': 'Cannot skip completed plan'}), 400
+        plan = plan_result.data[0]
         
-        # Toggle skip status
-        new_skip_status = not result.data[0]['is_skipped']
-        update_result = db_config.supabase.table('daily_plans').update({
-            'is_skipped': new_skip_status,
-            'updated_at': datetime.utcnow().isoformat()
-        }).eq('id', plan_id).eq('user_id', user_data.get('user_id')).execute()
+        # Get the date from request body or use today
+        data = request.get_json() or {}
+        target_date = data.get('date', datetime.utcnow().date().isoformat())
         
-        if update_result.data:
-            return jsonify({
-                'success': True,
-                'message': f'Plan {"skipped" if new_skip_status else "unskipped"}',
-                'is_skipped': new_skip_status
-            }), 200
+        # Check if this is a recurring plan
+        if plan.get('repeat_type') in ['daily', 'weekly', 'biweekly', 'monthly', 'weekdays', 'weekends']:
+            # For recurring plans, create/update plan instance
+            instance_data = {
+                'plan_id': plan_id,
+                'user_id': user_id,
+                'instance_date': target_date,
+                'is_completed': False,
+                'is_skipped': True,
+                'updated_at': datetime.utcnow().isoformat()
+            }
+            
+            # Check if instance already exists
+            existing_instance = db_config.supabase.table('plan_instances').select('*').eq('plan_id', plan_id).eq('instance_date', target_date).execute()
+            
+            if existing_instance.data:
+                # Update existing instance
+                update_result = db_config.supabase.table('plan_instances').update({
+                    'is_completed': False,
+                    'is_skipped': True,
+                    'completed_at': None,
+                    'updated_at': datetime.utcnow().isoformat()
+                }).eq('id', existing_instance.data[0]['id']).execute()
+            else:
+                # Create new instance
+                update_result = db_config.supabase.table('plan_instances').insert(instance_data).execute()
+            
+            if update_result.data:
+                return jsonify({
+                    'success': True,
+                    'message': 'Plan instance skipped',
+                    'is_skipped': True,
+                    'instance_date': target_date
+                }), 200
+            else:
+                return jsonify({'error': 'Failed to update plan instance'}), 500
         else:
-            return jsonify({'error': 'Failed to update plan'}), 500
+            # For one-time plans, update the plan directly
+            if plan.get('is_completed'):
+                return jsonify({'error': 'Cannot skip completed plan'}), 400
+            
+            new_skip_status = not plan.get('is_skipped', False)
+            update_result = db_config.supabase.table('daily_plans').update({
+                'is_skipped': new_skip_status,
+                'updated_at': datetime.utcnow().isoformat()
+            }).eq('id', plan_id).eq('user_id', user_id).execute()
+            
+            if update_result.data:
+                return jsonify({
+                    'success': True,
+                    'message': f'Plan {"skipped" if new_skip_status else "unskipped"}',
+                    'is_skipped': new_skip_status
+                }), 200
+            else:
+                return jsonify({'error': 'Failed to update plan'}), 500
             
     except Exception as e:
         return jsonify({'error': str(e)}), 500

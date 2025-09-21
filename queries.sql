@@ -59,3 +59,19 @@ CREATE TABLE push_events (
     payload JSONB,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+CREATE TABLE plan_instances (
+                    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+                    plan_id UUID REFERENCES daily_plans(id) ON DELETE CASCADE,
+                    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+                    instance_date DATE NOT NULL,
+                    is_completed BOOLEAN DEFAULT FALSE,
+                    is_skipped BOOLEAN DEFAULT FALSE,
+                    completed_at TIMESTAMP WITH TIME ZONE,
+                    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+                    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+                    UNIQUE(plan_id, instance_date)
+                );
+                
+                CREATE INDEX idx_plan_instances_plan_date ON plan_instances(plan_id, instance_date);
+                CREATE INDEX idx_plan_instances_user_date ON plan_instances(user_id, instance_date);

@@ -64,6 +64,40 @@ export default function Home() {
     return day === 0 || day === 6;
   };
 
+  const isPlanCompletedForDate = (plan: any, date: Date) => {
+    const dateStr = date.toISOString().split('T')[0];
+
+    // For one-time plans, check the plan's completion status
+    if (plan.repeat_type === 'once') {
+      return plan.is_completed || false;
+    }
+
+    // For recurring plans, check instances
+    if (plan.instances && plan.instances.length > 0) {
+      const instance = plan.instances.find((inst: any) => inst.instance_date === dateStr);
+      return instance ? instance.is_completed : false;
+    }
+
+    return false;
+  };
+
+  const isPlanSkippedForDate = (plan: any, date: Date) => {
+    const dateStr = date.toISOString().split('T')[0];
+
+    // For one-time plans, check the plan's skip status
+    if (plan.repeat_type === 'once') {
+      return plan.is_skipped || false;
+    }
+
+    // For recurring plans, check instances
+    if (plan.instances && plan.instances.length > 0) {
+      const instance = plan.instances.find((inst: any) => inst.instance_date === dateStr);
+      return instance ? instance.is_skipped : false;
+    }
+
+    return false;
+  };
+
   const occursOnDate = (plan: any, date: Date) => {
     const start = parseISODate(plan.scheduled_date);
     if (!start) return false;
@@ -199,7 +233,8 @@ export default function Home() {
   const handleSkipPlan = async (planId: string) => {
     setIsLoading(true);
     try {
-      const res = await apiService.skipPlan(planId);
+      const dateStr = selectedDate.toISOString().split('T')[0];
+      const res = await apiService.skipPlan(planId, dateStr);
       if (res.success) {
         await loadPlans();
         setShowPlanModal(false);
@@ -424,39 +459,41 @@ export default function Home() {
                         <Text style={{
                           fontFamily: 'Poppins_600SemiBold',
                           fontSize: 16,
-                          color: plan.is_skipped ? '#9CA3AF' : '#111827',
+                          color: isPlanSkippedForDate(plan, selectedDate) ? '#9CA3AF' : '#111827',
                           marginBottom: 4,
-                          textDecorationLine: plan.is_completed ? 'line-through' : 'none',
+                          textDecorationLine: isPlanCompletedForDate(plan, selectedDate) ? 'line-through' : 'none',
                           textDecorationStyle: 'solid'
                         }}>
                           {plan.name}
-                          {plan.is_skipped && ' (Skipped)'}
+                          {isPlanSkippedForDate(plan, selectedDate) && ' (Skipped)'}
                         </Text>
                         <Text style={{
                           fontFamily: 'Poppins_400Regular',
                           fontSize: 12,
-                          color: plan.is_skipped ? '#9CA3AF' : '#6B7280'
+                          color: isPlanSkippedForDate(plan, selectedDate) ? '#9CA3AF' : '#6B7280'
                         }}>
                           {formatTimeTo12h(plan.start_time)}-{formatTimeTo12h(plan.end_time)} ({plan.duration_minutes}m)
                         </Text>
                       </View>
                     </Pressable>
                     <Pressable onPress={async () => {
-                      if (plan.is_completed) return;
-                      const res = await apiService.togglePlanCompletion(plan.id);
+                      const isCompleted = isPlanCompletedForDate(plan, selectedDate);
+                      if (isCompleted) return;
+                      const dateStr = selectedDate.toISOString().split('T')[0];
+                      const res = await apiService.togglePlanCompletion(plan.id, dateStr);
                       if (res.success) { setConfettiAt(Date.now()); }
                     }} style={{
                       width: 24,
                       height: 24,
                       borderRadius: 12,
                       borderWidth: 2,
-                      borderColor: plan.is_completed ? '#10B981' : '#D1D5DB',
-                      backgroundColor: plan.is_completed ? '#10B981' : 'transparent',
+                      borderColor: isPlanCompletedForDate(plan, selectedDate) ? '#10B981' : '#D1D5DB',
+                      backgroundColor: isPlanCompletedForDate(plan, selectedDate) ? '#10B981' : 'transparent',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      opacity: plan.is_completed ? 1 : 1
+                      opacity: isPlanCompletedForDate(plan, selectedDate) ? 1 : 1
                     }}>
-                      {plan.is_completed && (
+                      {isPlanCompletedForDate(plan, selectedDate) && (
                         <Text style={{ fontSize: 12, color: 'white' }}>✓</Text>
                       )}
                     </Pressable>
@@ -528,30 +565,32 @@ export default function Home() {
                     <Text style={{
                       fontFamily: 'Poppins_600SemiBold',
                       fontSize: 16,
-                      color: plan.is_skipped ? '#9CA3AF' : '#111827',
+                      color: isPlanSkippedForDate(plan, selectedDate) ? '#9CA3AF' : '#111827',
                       flex: 1,
-                      textDecorationLine: plan.is_completed ? 'line-through' : 'none',
+                      textDecorationLine: isPlanCompletedForDate(plan, selectedDate) ? 'line-through' : 'none',
                       textDecorationStyle: 'solid'
                     }}>
                       {plan.name}
-                      {plan.is_skipped && ' (Skipped)'}
+                      {isPlanSkippedForDate(plan, selectedDate) && ' (Skipped)'}
                     </Text>
                   </Pressable>
                   <Pressable onPress={async () => {
-                    if (plan.is_completed) return;
-                    const res = await apiService.togglePlanCompletion(plan.id);
+                    const isCompleted = isPlanCompletedForDate(plan, selectedDate);
+                    if (isCompleted) return;
+                    const dateStr = selectedDate.toISOString().split('T')[0];
+                    const res = await apiService.togglePlanCompletion(plan.id, dateStr);
                     if (res.success) { setConfettiAt(Date.now()); }
                   }} style={{
                     width: 24,
                     height: 24,
                     borderRadius: 12,
                     borderWidth: 2,
-                    borderColor: plan.is_completed ? '#10B981' : '#D1D5DB',
-                    backgroundColor: plan.is_completed ? '#10B981' : 'transparent',
+                    borderColor: isPlanCompletedForDate(plan, selectedDate) ? '#10B981' : '#D1D5DB',
+                    backgroundColor: isPlanCompletedForDate(plan, selectedDate) ? '#10B981' : 'transparent',
                     alignItems: 'center',
                     justifyContent: 'center'
                   }}>
-                    {plan.is_completed && (<Text style={{ fontSize: 12, color: 'white' }}>✓</Text>)}
+                    {isPlanCompletedForDate(plan, selectedDate) && (<Text style={{ fontSize: 12, color: 'white' }}>✓</Text>)}
                   </Pressable>
                 </View>
               ))}
@@ -752,7 +791,7 @@ export default function Home() {
                 fontSize: 18,
                 color: '#111827',
                 flex: 1,
-                textDecorationLine: modalPlan.is_completed ? 'line-through' : 'none',
+                textDecorationLine: isPlanCompletedForDate(modalPlan, selectedDate) ? 'line-through' : 'none',
                 textDecorationStyle: 'solid'
               }}>{modalPlan.name}</Text>
               <View style={{
@@ -760,12 +799,12 @@ export default function Home() {
                 height: 28,
                 borderRadius: 14,
                 borderWidth: 2,
-                borderColor: modalPlan.is_completed ? '#10B981' : '#D1D5DB',
-                backgroundColor: modalPlan.is_completed ? '#10B981' : 'transparent',
+                borderColor: isPlanCompletedForDate(modalPlan, selectedDate) ? '#10B981' : '#D1D5DB',
+                backgroundColor: isPlanCompletedForDate(modalPlan, selectedDate) ? '#10B981' : 'transparent',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}>
-                {modalPlan.is_completed && (
+                {isPlanCompletedForDate(modalPlan, selectedDate) && (
                   <Text style={{ fontSize: 12, color: 'white' }}>✓</Text>
                 )}
               </View>
@@ -833,7 +872,7 @@ export default function Home() {
 
             {/* Action Buttons */}
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 12 }}>
-              {!modalPlan.is_completed && (
+              {!isPlanCompletedForDate(modalPlan, selectedDate) && (
                 <>
                   <Pressable
                     onPress={() => handleSkipPlan(modalPlan.id)}

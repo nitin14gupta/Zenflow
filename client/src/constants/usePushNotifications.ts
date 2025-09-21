@@ -32,8 +32,8 @@ export const usePushNotifications = (): PushNotificationState => {
         Notifications.Notification | undefined
     >();
 
-    const notificationListener = useRef<Notifications.Subscription>();
-    const responseListener = useRef<Notifications.Subscription>();
+    const notificationListener = useRef<Notifications.Subscription | null>(null);
+    const responseListener = useRef<Notifications.Subscription | null>(null);
 
     async function registerForPushNotificationsAsync() {
         let token;
@@ -62,9 +62,7 @@ export const usePushNotifications = (): PushNotificationState => {
                 return;
             }
 
-            token = await Notifications.getExpoPushTokenAsync({
-                projectId: Constants.expoConfig?.extra?.eas.projectId,
-            });
+            token = await Notifications.getExpoPushTokenAsync();
         } else {
             alert("Must be using a physical device for Push notifications");
         }
@@ -93,8 +91,8 @@ export const usePushNotifications = (): PushNotificationState => {
             });
 
         return () => {
-            try { notificationListener.current?.remove && notificationListener.current.remove(); } catch { }
-            try { responseListener.current?.remove && responseListener.current.remove(); } catch { }
+            try { notificationListener.current?.remove(); } catch { }
+            try { responseListener.current?.remove(); } catch { }
         };
     }, []);
 

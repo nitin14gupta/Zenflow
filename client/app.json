@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "zenflow",
-    "slug": "zenflow",
+    "name": "freshday",
+    "slug": "freshday",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.zenflow.app",
+      "bundleIdentifier": "com.freshday.app",
       "usesAppleSignIn": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -25,7 +25,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.zenflow.app",
+      "package": "com.freshday.app",
       "googleServicesFile": "./google-services.json"
     },
     "web": {
